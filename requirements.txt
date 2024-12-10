@@ -1,0 +1,4 @@
+openpyxl
+streamlit
+openai
+openai-whisper

@@ -1,0 +1,6 @@
+id,email,first_name,last_name,username,password,work_experience
+1,mail_dummy,Dimitar,Ivanov,dimitar.ivanov,abc,10
+2,mail_dummy,Elena,Petrova,elena.p,abc,9
+3,mail_dummy,Nikolay,Stefanov,nikolay.s,abc,3
+4,mail_dummy,Gabriela,Marinova,gabrtiela.m,abc,2
+5,mail_dummy,Hristo,Todorov,hristo.t,abc,15

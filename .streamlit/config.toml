@@ -1,0 +1,13 @@
+# .streamlit/config.toml
+
+# Light and Dark Mode Themes Inspired by Vector Labs Branding
+
+[theme]
+# Dark mode theme
+primaryColor = "#1abc9c"  # Teal accent color consistent with branding
+backgroundColor = "#131f4d"  # Dark teal background
+secondaryBackgroundColor = "#376e8f"  # Slightly lighter teal for contrast
+textColor = "#ffffff"  # White text for readability
+font = "sans serif"  # Matches light mode for consistency
+base = "dark"
+
