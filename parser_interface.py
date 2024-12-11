@@ -40,7 +40,7 @@ def get_teacher_data(username=None, id=None):
     print("Teacher: ", teacher)
     return teacher
 
-@st.cache_resource
+# @st.cache_resource
 def get_student_data(id):
     global parser
     students = parser.students
@@ -52,6 +52,8 @@ def get_student_data(id):
         st.session_state['ti_profile'] = str(student['profile'].values[0])
     else:
         st.warning("Did not find the student in the database")
+
+    return student
 
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
@@ -100,8 +102,9 @@ if "audi_eff" not in st.session_state:
     st.session_state["audi_eff_key"] = "eff" + str(st.session_state['counter'])
 
 
-def reset_state():
+def reset_state(test):
     print("resetting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    test = "blabla"
     st.session_state.counter += 1
     st.session_state["audi_eff_key"] = "eff" + str(st.session_state['counter'])
     st.session_state["audi_act_key"] = "act" + str(st.session_state['counter'])
@@ -137,8 +140,8 @@ if st.session_state['authentication_status']:
         st.session_state["ti_teacher_id"] = logged_teacher_id
     # Title of the application
     # '# Въпросник "Ситуации соп" '
-    '# Училищни Случаи - Аутизъм'
-    "###### Формулар за събиране на ситуации относно индивидуалните прояви и предизвикателства при деца с аутизъм"
+    '# Бланка за описване на ситуация и реакция при работа с деца със СОП'
+    # "###### Формулар за събиране на ситуации относно индивидуалните прояви и предизвикателства при деца с аутизъм"
 
     " "
     teacher_form = logged_teacher
@@ -172,8 +175,12 @@ if st.session_state['authentication_status']:
 
 
     st.markdown("##### Уникален анонимен номер на детето:")
-    st.session_state["ti_student_id"] = st.text_input("b", value=st.session_state["ti_student_id"], label_visibility="collapsed")
-    if st.session_state["ti_student_id"]:
+    #print(st.session_state["ti_student_id"])
+    test = st.text_input("b", value=st.session_state["ti_student_id"], label_visibility="collapsed")
+    #print(st.session_state["ti_student_id"])
+    if test:
+        print("check")
+        st.session_state["ti_student_id"] = test
         student = get_student_data(st.session_state["ti_student_id"])
 
     "##### Дата на случката:"   
@@ -252,7 +259,7 @@ if st.session_state['authentication_status']:
     "#### Оценете ефекта от вашата реакция от 1 до 10:"
     st.session_state["grade_slider"] = st.slider("**Оценете ефекта от вашата реакция от 1 до 10:**", 1, 10, value=st.session_state["grade_slider"], key="slider", label_visibility="collapsed")
 
-    "## Информация за спецялиста и детето"
+    "## Информация за специалиста и детето"
     "#### Колко години опит имате:"
     
     st.session_state['ti_xp'] = st.text_input("Колко години опит имате:", value=st.session_state["ti_xp"], label_visibility="collapsed")
@@ -332,7 +339,7 @@ if st.session_state['authentication_status']:
             if downloaded or reset:
                 st.session_state.download = False
                 print("resetingggg")
-                reset_state()
+                reset_state(test)
                 st.rerun()
                 
 

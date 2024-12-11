@@ -30,7 +30,7 @@ class Parser():
                  db_teacher_path = os.path.join("data", "teacher.csv"), db_students_path = os.path.join("data", "student.csv"), db_forms_path = os.path.join("data", "forms_meta.csv")):
 
         if transcriptor == "api":
-            self.model = "test" #openai.OpenAI()
+            self.model = openai.OpenAI()
         #elif transcriptor == "local":
         #    self.model = whisper.load_model("small", in_memory = True )
 
@@ -105,7 +105,7 @@ class Parser():
         #    transcript = result["text"]
         #else:
             audio_file= open(speech_path, "rb")
-            result = self.client.audio.transcriptions.create(
+            result = self.model.audio.transcriptions.create(
             model="whisper-1", 
             file=audio_file,
             language="bg"

@@ -16,7 +16,10 @@ form_id,form_path,date,time,audio_sit,audio_action,audio_effect,transcript_sit,t
 4026103108310248269,logging/forms/form(19).xlsx,11-12-2024,08:16,,,,empty,empty,empty,2.0,
 4846538004460463848,logging/forms/form(22).xlsx,11-12-2024,08:17,,,,empty,empty,empty,,
 -5019801227022878484,logging/forms/form(24).xlsx,11-12-2024,08:25,,,,empty,empty,empty,1.0,2.0
--5814938335320876451,logging/forms/form(25).xlsx,11-12-2024,08:31,None,None,None,empty,empty,empty,3,2
--6311534319543338906,logging/forms/form(26).xlsx,11-12-2024,08:40,logging/recordings/situation_audio_11-12-2024.mp3,None,None, Дlaubно са план дозв empира sk1t!,empty,empty,2,
-1845297951803321974,logging/forms/form(27).xlsx,11-12-2024,08:40,logging/recordings/situation_audio_11-12-2024.mp3,None,None, Дlaubно са план дозв empира sk1t!,empty,empty,,
-1325472378664858794,logging/forms/form(28).xlsx,11-12-2024,08:41,logging/recordings/situation_audio_11-12-2024.mp3,None,None, Дlaubно са план дозв empира sk1t!,empty,empty,,
+-5814938335320876451,logging/forms/form(25).xlsx,11-12-2024,08:31,,,,empty,empty,empty,3.0,2.0
+-6311534319543338906,logging/forms/form(26).xlsx,11-12-2024,08:40,logging/recordings/situation_audio_11-12-2024.mp3,,, Дlaubно са план дозв empира sk1t!,empty,empty,2.0,
+1845297951803321974,logging/forms/form(27).xlsx,11-12-2024,08:40,logging/recordings/situation_audio_11-12-2024.mp3,,, Дlaubно са план дозв empира sk1t!,empty,empty,,
+1325472378664858794,logging/forms/form(28).xlsx,11-12-2024,08:41,logging/recordings/situation_audio_11-12-2024.mp3,,, Дlaubно са план дозв empира sk1t!,empty,empty,,
+9086522915278901917,logging/forms/form.xlsx,11-12-2024,10:38,None,None,None,empty,empty,empty,2,
+8535355705776935830,logging/forms/form(1).xlsx,11-12-2024,10:39,None,None,None,empty,empty,empty,,
+7185919556463157435,logging/forms/form(2).xlsx,11-12-2024,10:40,None,None,None,empty,empty,empty,,
