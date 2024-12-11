@@ -3,8 +3,8 @@ import json
 import io
 import os
 import openai
+# import whisper
 import pandas as pd
-import whisper
 from streamlit_authenticator import Hasher
 import yaml
 
@@ -30,9 +30,9 @@ class Parser():
                  db_teacher_path = os.path.join("data", "teacher.csv"), db_students_path = os.path.join("data", "student.csv"), db_forms_path = os.path.join("data", "forms_meta.csv")):
 
         if transcriptor == "api":
-            self.model = openai.OpenAI()
-        elif transcriptor == "local":
-            self.model = whisper.load_model("small", in_memory = True )
+            self.model = "test" #openai.OpenAI()
+        #elif transcriptor == "local":
+        #    self.model = whisper.load_model("small", in_memory = True )
 
         self.transcriptor = transcriptor
 
@@ -98,10 +98,10 @@ class Parser():
         return os.path.isfile(path)
 
     def transcript_speech(self, speech_path):
-        if self.transcriptor == "local":
-            result = self.model.transcribe(speech_path, language="bg")
-            transcript = result["text"]
-        else:
+        #if self.transcriptor == "local":
+        #    result = self.model.transcribe(speech_path, language="bg")
+        #    transcript = result["text"]
+        #else:
             audio_file= open(speech_path, "rb")
             result = self.client.audio.transcriptions.create(
             model="whisper-1", 
@@ -110,7 +110,7 @@ class Parser():
             )
             transcript = result.text
 
-        return transcript
+            return transcript
     
     def wb_to_dict(self, path_form):
         workbook = openpyxl.load_workbook(path_form)

@@ -2,3 +2,4 @@ logging/
 .venv/
 console.py
 config.yaml
+secrets.toml

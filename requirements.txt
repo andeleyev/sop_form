@@ -1,7 +1,6 @@
 openpyxl
 streamlit
 openai
-openai-whisper
 streamlit-authenticator
 pandas
 streamlit-extras

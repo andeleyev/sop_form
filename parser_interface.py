@@ -9,22 +9,15 @@ from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🧪", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
-st.markdown("""
-    <style>
-    .stylable-container {
-        background-color: #f0f0f0;
-        padding: 20px;
-        border-radius: 10px;
-    }
-    </style>
-""", unsafe_allow_html=True)
+api = st.secrets["general"]["api_key"]
+
 
 now = datetime.datetime.now()
 today = now.strftime("%d-%m-%Y")
 
 @st.cache_resource
 def initialize():
-    parser = form_parser.Parser(transcriptor="local")
+    parser = form_parser.Parser()
     return parser
 
 parser = initialize()
@@ -132,7 +125,7 @@ authenticator.login(fields={'Form name':'Login', 'Username':'вашето пот
 
 if st.session_state['authentication_status']:
     st.write(f'Welcome *{st.session_state["name"]}*')
-
+    st.write(f'KEy: {api}')
     username = st.session_state["username"]
     
     logged_teacher = get_teacher_data(username)  
