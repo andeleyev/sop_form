@@ -1,5 +1,3 @@
-
-path_form = "form.xlsx"
 import openpyxl
 import json
 import io
@@ -25,19 +23,6 @@ situation = 'B19'
 action_taken = 'B20'
 effect = 'B21'
 rating = 'B22'
-
-def main():
-    # Load the workbook
-    workbook = openpyxl.load_workbook(path_form)
-    s = workbook.active
-    parser = Parser(transcriptor="local")
-    test_data, test_scenario = parser.wb_to_dict(s)
-
-    with open('parsed_scenario.json', 'w') as f:
-        json.dump(test_data, f, ensure_ascii=False, indent=4)
-
-    with open('parsed_form.json', 'w') as f:
-        json.dump(test_scenario, f, ensure_ascii=False, indent=4)
 
 class Parser():
 

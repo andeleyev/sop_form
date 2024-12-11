@@ -4,10 +4,10 @@
 
 [theme]
 # Dark mode theme
-primaryColor = "#1abc9c"  # Teal accent color consistent with branding
-backgroundColor = "#131f4d"  # Dark teal background
-secondaryBackgroundColor = "#376e8f"  # Slightly lighter teal for contrast
-textColor = "#ffffff"  # White text for readability
+primaryColor = "#2fa121"  # Teal accent color consistent with branding
+backgroundColor = "#c1eabc"  # Dark teal background
+secondaryBackgroundColor = "#ffffff"  # Slightly lighter teal for contrast
+textColor = "#000000"  # White text for readability
 font = "sans serif"  # Matches light mode for consistency
 base = "dark"
 

@@ -4,9 +4,20 @@ import form_parser
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+from streamlit_extras.stylable_container import stylable_container
+
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🧪", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
+st.markdown("""
+    <style>
+    .stylable-container {
+        background-color: #f0f0f0;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 now = datetime.datetime.now()
 today = now.strftime("%d-%m-%Y")
@@ -62,7 +73,62 @@ authenticator = stauth.Authenticate(
     auto_hash=False
 )
 
-authenticator.login(fields={'Form name':'Login', 'Username':'Вашия ИД', 'Password':'Парола', 'Login':'Login', 'Captcha':'Captcha'})
+if not "counter" in st.session_state:
+    st.session_state.counter = 0
+
+#if "ti_teacher_id" not in st.session_state: THis better later
+#    st.session_state["ti_teacher_id"] = ""
+if "ti_student_id" not in st.session_state:
+    st.session_state["ti_student_id"] = ""
+if "date_i" not in st.session_state:
+    st.session_state["date_i"] = "today"
+if "text_sit" not in st.session_state:
+    st.session_state["text_sit"] = ""
+if "text_act" not in st.session_state:
+    st.session_state["text_act"] = ""
+if "text_eff" not in st.session_state:
+    st.session_state["text_eff"] = ""
+if "grade_slider" not in st.session_state:
+    st.session_state["grade_slider"] = 5
+if "ti_xp" not in st.session_state:
+    st.session_state["ti_xp"] = ""   
+if "ti_age" not in st.session_state:
+    st.session_state["ti_age"] = ""
+if "ti_xp_toghether" not in st.session_state:
+    st.session_state["ti_xp_toghether"] = ""
+if "ti_profile" not in st.session_state:
+    st.session_state["ti_profile"] = ""
+if "audi_sit" not in st.session_state:
+    st.session_state["audi_sit_key"] = "sit" + str(st.session_state['counter'])
+if "audi_act" not in st.session_state:
+    st.session_state["audi_act_key"] = "act" + str(st.session_state['counter'])
+if "audi_eff" not in st.session_state:
+    st.session_state["audi_eff_key"] = "eff" + str(st.session_state['counter'])
+
+
+def reset_state():
+    print("resetting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    st.session_state.counter += 1
+    st.session_state["audi_eff_key"] = "eff" + str(st.session_state['counter'])
+    st.session_state["audi_act_key"] = "act" + str(st.session_state['counter'])
+    st.session_state["audi_sit_key"] = "sit" + str(st.session_state['counter'])
+    st.session_state["ti_teacher_id"] = ""
+    st.session_state["ti_student_id"] = ""
+    st.session_state["date_i"] = "today"
+    st.session_state["text_sit"] = ""
+    st.session_state["text_act"] = ""
+    st.session_state["text_eff"] = ""
+    st.session_state["grade_slider"] = 5
+    st.session_state["ti_xp"] = ""
+    st.session_state["ti_age"] = ""
+    st.session_state["ti_xp_toghether"] = ""
+    st.session_state["ti_profile"] = ""
+    st.session_state["audi_sit"] = ""
+    st.session_state["audi_act"] = ""
+    st.session_state["audi_eff"] = ""
+
+
+authenticator.login(fields={'Form name':'Login', 'Username':'вашето потребителско име', 'Password':'парола', 'Login':'Login', 'Captcha':'Captcha'})
 
 if st.session_state['authentication_status']:
     st.write(f'Welcome *{st.session_state["name"]}*')
@@ -72,12 +138,16 @@ if st.session_state['authentication_status']:
     logged_teacher = get_teacher_data(username)  
     logged_teacher_id = str(logged_teacher['id'].values[0])
     
+    
+    if "ti_teacher_id" not in st.session_state:
+        st.session_state["ti_teacher_id"] = logged_teacher_id
     # Title of the application
-    st.title("Autism Scenario Questionnaire")
-    teacher_form = logged_teacher
+    # '# Въпросник "Ситуации соп" '
+    '# Училищни Случаи - Аутизъм'
+    "###### Формулар за събиране на ситуации относно индивидуалните прояви и предизвикателства при деца с аутизъм"
 
-    if 'downlaod' not in st.session_state:
-        st.session_state.download = False
+    " "
+    teacher_form = logged_teacher
 
     # Speech input button
     # audio_st = st.audio_input("🎤 Говори", key=f"voice_input_{st.session_state.audio_key}")
@@ -98,99 +168,179 @@ if st.session_state['authentication_status']:
         return script, audio_path
 
     # Form layout
-    st.subheader("Идентификационна информация")
-    teacher_id = st.text_input("Вашият уникален анонимен идентификатор:", key="ti_teacher_id", value=logged_teacher_id)
-    if teacher_id != logged_teacher_id:
-        teacher_form = get_teacher_data(id=teacher_id)
-
-    def_teacher_xp = teacher_form['work_experience'].values[0]
-
-    student_id = st.text_input("Уникален анонимен номер на детето:", key="ti_student_id")
-    if student_id:
-        student = get_student_data(student_id)
-    date = st.date_input("Дата на случката:", key="date", format="DD.MM.YYYY") # remove default to make it today
+    "## Идентификационна информация"
+    " "
+    "##### Вашият уникален анонимен идентификатор:"
+    st.session_state["ti_teacher_id"] = st.text_input("a", value=st.session_state["ti_teacher_id"], label_visibility="collapsed")
+    if st.session_state["ti_teacher_id"] != "":
+        teacher_form = get_teacher_data(id=st.session_state["ti_teacher_id"])
+        st.session_state['ti_xp'] = teacher_form['work_experience'].values[0]
 
 
-    st.subheader("Ситуация и реакция ")
-    audio_sit = st.audio_input("говори за ситуацуята")
-    transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio_{today}.mp3") 
-    situation = st.text_area("Опишете ситуацията, която се е случила:", key="tf_situation", value=transcript_sit)
+    st.markdown("##### Уникален анонимен номер на детето:")
+    st.session_state["ti_student_id"] = st.text_input("b", value=st.session_state["ti_student_id"], label_visibility="collapsed")
+    if st.session_state["ti_student_id"]:
+        student = get_student_data(st.session_state["ti_student_id"])
 
-    audio_act = st.audio_input("говори за какви действия предприехте")
-    transcript_act, audio_act_path = transcribe(audio_act, f"action_audio_{today}.mp3")
-    action = st.text_area("Опишете реакцията, която сте предприели:", key="tf_action", value=transcript_act)
-
-    audio_eff = st.audio_input("как се е развила ситуацията")
-    transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio_{today}.mp3")
-    effect= st.text_area("Опишете ефекта от вашата реакция:", key="tf_effect", value=transcript_eff)
-
-    grade= st.slider("Оценете ефекта от вашата реакция от 1 до 10:", 1, 10, 5, key="slider")
-
-    st.subheader("Информация за ресурсния учител")
-    teacher_xp = st.text_input("Колко години опит имате:", key="ti_teacher_xp", value=def_teacher_xp)
-
-    st.subheader("Информация за детето")
-    student_age = st.text_input("На колко години е детето:", key="ti_age")
-    xp_with_student = st.text_input("От колко години работите с това дете:", key="ti_xp_with_student")
-    profile = st.text_input("Какъв е профилът на детето? / Какъв е линкът към досието му:", key="ti_profile")
+    "##### Дата на случката:"   
+    date = st.date_input("Дата на случката:", value=st.session_state["date_i"], format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
 
 
+    "## Ситуация и реакция "
+    "  "
+    "#### **Опишете устно или писмено ситуацията, която се е случила:**"
+    "(за гласов запис натиснете микрофона)"
+    a1, a2 = st.columns([5, 1])
 
-    submit = st.button("Submit")
+    with a2:
+        with stylable_container(
+            key="orange",
+            css_styles="""
+                button {
+                    background-color: green;
+                    color: white;
+                    border-radius: 20px;
+                }
+                """,
+        ):  
+            audio_sit = st.audio_input("aa", key=st.session_state["audi_sit_key"], label_visibility="collapsed")
 
-    if submit or st.session_state['download']:
+        transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio_{today}.mp3")
+        if transcript_sit != "":
+            st.session_state["text_sit"] = transcript_sit
+    with a1:
+        st.session_state["text_sit"] = st.text_area("ситуацията", value=st.session_state["text_sit"], placeholder="write here", height=257, label_visibility="collapsed")
 
-        
-        st.session_state.download = True
+    "  "
+    "#### **Опишете устно или писмено Вашата реакция:**"
+    "(за гласов запис натиснете микрофона)"
+    b1, b2 = st.columns([5, 1])
+    with b2:
+        with stylable_container(
+            key="orange",
+            css_styles="""
+                button {
+                    background-color: green;
+                    color: white;
+                    border-radius: 20px;
+                }
+                """,
+        ): 
+            audio_act = st.audio_input("действия", key=st.session_state["audi_act_key"], label_visibility="collapsed")
+        transcript_act, audio_act_path = transcribe(audio_act, f"action_audio_{today}.mp3")
+        if transcript_act != "":
+            st.session_state["text_act"] = transcript_act
+    with b1:
+        st.session_state["text_act"] = st.text_area("реакцията", value=st.session_state["text_act"], height=257, label_visibility="collapsed")
 
-        if submit:
-            inputs = {
-                "teacher_id": teacher_id,
-                "student_id": student_id,
-                "date": date.strftime("%d-%m-%Y"),
-                "teacher_xp": teacher_xp,
-                "student_age": student_age,
-                "xp_with_child": xp_with_student,
-                "student_profile": profile,
-                "situation": situation,
-                "action": action,
-                "effect": effect,
-                "grade": grade,
-            }
+    "  "
+    "#### Опишете устно или писмено **ефекта** от Вашата реакция:"
+    "(за гласов запис натиснете микрофона)",
+    c1, c2 = st.columns([5, 1])
+    with c2:
+        with stylable_container(
+            key="orange",
+            css_styles="""
+                button {
+                    background-color: green;
+                    color: white;
+                    border-radius: 20px;
+                }
+                """,
+        ): 
+            audio_eff = st.audio_input("как се е развила ситуацията", key=st.session_state["audi_eff_key"], label_visibility="collapsed")
+        transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio_{today}.mp3")
+        if transcript_eff != "":
+            st.session_state["text_eff"] = transcript_eff
+    with c1:
+        st.session_state["text_eff"]= st.text_area("Опишете ефекта от вашата реакция:", value=st.session_state["text_eff"], height=257, label_visibility="collapsed")
+
+    "#### Оценете ефекта от вашата реакция от 1 до 10:"
+    st.session_state["grade_slider"] = st.slider("**Оценете ефекта от вашата реакция от 1 до 10:**", 1, 10, value=st.session_state["grade_slider"], key="slider", label_visibility="collapsed")
+
+    "## Информация за спецялиста и детето"
+    "#### Колко години опит имате:"
     
-            exel, exel_path = parser.write_to_exel(inputs)
-            st.session_state.exel = exel
-            # print(st.session_state.exel)
-            time = now.strftime('%H:%M')
+    st.session_state['ti_xp'] = st.text_input("Колко години опит имате:", value=st.session_state["ti_xp"], label_visibility="collapsed")
+    
 
-            if transcript_sit == "":
-                transcript_sit = "empty"
-            if transcript_act == "":
-                transcript_act = "empty"
-            if transcript_sit == "":
-                transcript_act = "empty"
+    "#### На колко години е детето:"
+    
+    st.session_state["ti_age"] = st.text_input("На колко години е детето:", value=st.session_state["ti_age"], label_visibility="collapsed")
 
-            parser.add_from_to_db(exel_path, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, transcript_sit, transcript_act, transcript_eff, student_id, date.strftime("%d-%m-%Y"), time)
+    "#### От колко години работите с това дете:"
+    st.session_state["ti_xp_toghether"] = st.text_input("От колко години работите с това дете:", value=st.session_state["ti_xp_toghether"], label_visibility="collapsed")
 
-        downloaded = st.download_button("изтегляне на попълнения формуляр", data=st.session_state.exel, file_name="filled_form.xlsx")
-        reset = st.button("reset")
-        if downloaded or reset:
-            st.session_state.ti_teacher_id = ""
-            st.session_state.ti_student_id = ""
+    "#### Какъв е профилът на детето? / Какъв е линкът към досието му:"
+    st.session_state["ti_profile"] = st.text_input("профилът", value=st.session_state["ti_profile"], label_visibility="collapsed")
 
-            st.session_state.tf_situation = ""
-            st.session_state.tf_action = ""
-            st.session_state.tf_effect = ""
-            st.session_state.slider = 5
+    st.markdown(" ")
 
-            st.session_state.ti_teacher_xp = ""
-            st.session_state.ti_age = ""
-            st.session_state.ti_xp_with_student = ""
-            st.session_state.ti_profile = ""
+    with stylable_container(
+        key="green_buttons",
+        css_styles="""
+            button {
+                background-color: green;
+                color: white;
+                border-radius: 20px;
+            }
+            """,
+    ):  
+        submit = st.button("подаване на формуляр", use_container_width=True)
 
+        if not "download" in st.session_state:
             st.session_state.download = False
 
-            st.rerun()
+        if submit or st.session_state['download']:
+
+            
+            st.session_state.download = True
+
+            if submit:
+                inputs = {
+                    "teacher_id": st.session_state["ti_teacher_id"],
+                    "student_id": st.session_state["ti_student_id"],
+                    "date": date.strftime("%d-%m-%Y"),
+                    "teacher_xp": st.session_state["ti_xp"],
+                    "student_age": st.session_state["ti_age"],
+                    "xp_with_child": st.session_state["ti_xp_toghether"],
+                    "student_profile": st.session_state["ti_profile"],
+                    "situation": st.session_state["text_sit"],
+                    "action": st.session_state["text_act"],
+                    "effect": st.session_state["text_eff"],
+                    "grade": st.session_state["grade_slider"],
+                }
+        
+                exel, exel_path = parser.write_to_exel(inputs)
+                st.session_state.exel = exel
+                # print(st.session_state.exel)
+                time = now.strftime('%H:%M')
+
+                if transcript_sit == "":
+                    transcript_sit = "empty"
+                if transcript_act == "":
+                    transcript_act = "empty"
+                if transcript_eff == "":
+                    transcript_eff = "empty"
+
+                parser.add_from_to_db(exel_path, st.session_state["ti_teacher_id"], audio_sit_path, audio_act_path, audio_eff_path, 
+                                      transcript_sit, transcript_act, transcript_eff, st.session_state["ti_student_id"], date.strftime("%d-%m-%Y"), time)
+
+            d1, d2 = st.columns(2)
+
+            with d1:
+                downloaded = st.download_button("изтегляне на попълнения формуляр", use_container_width=True, data=st.session_state.exel, file_name="filled_form.xlsx")
+            
+            with d2:
+                reset = st.button("ресет", use_container_width=True)
+
+
+            if downloaded or reset:
+                st.session_state.download = False
+                print("resetingggg")
+                reset_state()
+                st.rerun()
+                
 
 
 elif st.session_state['authentication_status'] is False:
