@@ -8,7 +8,7 @@ from streamlit_extras.stylable_container import stylable_container
 import os
 from streamlit_extras.bottom_container import bottom
 
-st.set_page_config(page_title="SOP Form Parser", page_icon="🧪", layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
 api = st.secrets["general"]["api_key"]
 
@@ -79,11 +79,11 @@ if not "counter" in st.session_state:
 #    st.session_state["ti_teacher_id"] = ""
 if "ti_student_id" not in st.session_state:
     st.session_state["ti_student_id"] = ""
-if "text_sit_def" not in st.session_state:
+if "text_sit" not in st.session_state:
     st.session_state["text_sit"] = ""
-if "text_act_def" not in st.session_state:
+if "text_act" not in st.session_state:
     st.session_state["text_act"] = ""
-if "text_eff_def" not in st.session_state:
+if "text_eff" not in st.session_state:
     st.session_state["text_eff"] = ""
 if "grade_slider" not in st.session_state:
     st.session_state["grade_slider"] = 5
@@ -110,7 +110,7 @@ def reset_state():
     st.session_state["audi_act_key"] = "act" + str(st.session_state['counter'])
     st.session_state["audi_sit_key"] = "sit" + str(st.session_state['counter'])
 
-    st.session_state["tid"] = ""
+    # st.session_state["tid"] = ""
     st.session_state["sid"] = ""
 
     st.session_state["text_sit"] = ""
@@ -118,7 +118,7 @@ def reset_state():
     st.session_state["text_eff"] = ""
     st.session_state["grade"] = 3
 
-    st.session_state["ti_xp"] = ""
+    # st.session_state["ti_xp"] = ""
     st.session_state["ti_age"] = ""
     st.session_state["ti_xp_toghether"] = ""
     st.session_state["ti_profile"] = ""
@@ -136,13 +136,11 @@ if st.session_state['download']:
         d1, d2 = st.columns(2)
 
         with d1:
-            downloaded = st.download_button("изтегляне на попълнения формуляр", use_container_width=True, data=st.session_state.exel, file_name="filled_form.xlsx")
-        
+            downloaded = st.download_button("изтегляне на попълнения формуляр", type="primary", use_container_width=True, data=st.session_state.exel, file_name="filled_form.xlsx")
         with d2:
-            reset = st.button("ресет", use_container_width=True)
+            reset = st.button("попълни нов формулар", type="primary", use_container_width=True)
 
-
-        if downloaded or reset:
+        if reset:
             st.session_state.download = False
             print("resetingggg")
             reset_state()
@@ -224,6 +222,7 @@ if st.session_state['authentication_status']:
 
         transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio_{today}.mp3")
         if transcript_sit != "":
+            print("test")
             st.session_state["text_sit"] = transcript_sit
     with a1:
         st.text_area("ситуацията", key="text_sit", placeholder="write here", height=257, label_visibility="collapsed")
@@ -250,7 +249,6 @@ if st.session_state['authentication_status']:
     with b1:
         st.text_area("реакцията", key="text_act", height=257, label_visibility="collapsed")
 
-    "  "
     "#### Опишете устно или писмено **ефекта** от Вашата реакция:"
     "(за гласов запис натиснете микрофона)",
     c1, c2 = st.columns([5, 1])
@@ -272,8 +270,20 @@ if st.session_state['authentication_status']:
     with c1:
         st.text_area("Опишете ефекта от вашата реакция:", key="text_eff", height=257, label_visibility="collapsed")
 
-    "#### Оценете ефекта от вашата реакция от 1 до 10:"
-    st.slider("**Оценете ефекта от вашата реакция от 1 до 10:**", 1, 5, key="slider", label_visibility="collapsed")
+    st.markdown("#### Оценете ефекта от вашата реакция от 1 до 10:")
+    #e1, e2 = st.columns([5, 1])
+    #with e1:
+    #    st.markdown("#### Оценете ефекта от вашата реакция от 1 до 10:")
+    #with e2:
+    #    st.info("инфо")
+    
+    explain_grades = """# whaat
+    aint no way
+    aаааааааааin no way
+
+    that going fucking viral
+    """
+    st.slider("(за повече информацуя натиснете вапроцителния знак) ", 1, 5, key="slider", help=explain_grades, label_visibility="visible")
 
     st.markdown("## Информация за специалиста и детето \n\n #### Колко години опит имате:")
     st.text_input("Колко години опит имате:", key="ti_xp", label_visibility="collapsed")
@@ -290,54 +300,52 @@ if st.session_state['authentication_status']:
 
     st.markdown(" ")
 
-    with stylable_container(
-        key="green_buttons",
-        css_styles="""
-            button {
-                background-color: green;
-                color: white;
-                border-radius: 20px;
-            }
-            """,
-    ):  
-        submit = st.button("подаване на формуляр", use_container_width=True)
+    submit = st.button("подаване на формуляр", type="primary", use_container_width=True)
 
-        if submit:
+    if not "ballons" in st.session_state:
+        st.session_state.balloons = False
 
-            
-            st.session_state.download = True
+    if st.session_state.balloons:
+        st.session_state.balloons = False
+        st.balloons()
+        st.toast("Формулара е испратен", icon='🥳') 
 
-            if submit:
-                inputs = {
-                    "teacher_id": st.session_state["tid"],
-                    "student_id": st.session_state["sid"],
-                    "date": date.strftime("%d-%m-%Y"),
-                    "teacher_xp": st.session_state["ti_xp"],
-                    "student_age": st.session_state["ti_age"],
-                    "xp_with_child": st.session_state["ti_xp_toghether"],
-                    "student_profile": st.session_state["ti_profile"],
-                    "situation": st.session_state["text_sit"],
-                    "action": st.session_state["text_act"],
-                    "effect": st.session_state["text_eff"],
-                    "grade": st.session_state['slider']
-                }
+    if submit:
+        st.session_state.download = True
+
+        inputs = {
+            "teacher_id": st.session_state["tid"],
+            "student_id": st.session_state["sid"],
+            "date": date.strftime("%d-%m-%Y"),
+            "teacher_xp": st.session_state["ti_xp"],
+            "student_age": st.session_state["ti_age"],
+            "xp_with_child": st.session_state["ti_xp_toghether"],
+            "student_profile": st.session_state["ti_profile"],
+            "situation": st.session_state["text_sit"],
+            "action": st.session_state["text_act"],
+            "effect": st.session_state["text_eff"],
+            "grade": st.session_state['slider']
+        }
+
+        exel, exel_path = parser.write_to_exel(inputs)
+        if not exel is None:
+            st.session_state.balloons = True
+        st.session_state.exel = exel
+        # print(st.session_state.exel)
+        time = now.strftime('%H:%M')
+
+        if transcript_sit == "":
+            transcript_sit = "empty"
+        if transcript_act == "":
+            transcript_act = "empty"
+        if transcript_eff == "":
+            transcript_eff = "empty"
+
+        parser.add_from_to_db(exel_path, st.session_state["tid"], audio_sit_path, audio_act_path, audio_eff_path, 
+                                transcript_sit, transcript_act, transcript_eff, st.session_state["ti_student_id"], date.strftime("%d-%m-%Y"), time)
+
         
-                exel, exel_path = parser.write_to_exel(inputs)
-                st.session_state.exel = exel
-                # print(st.session_state.exel)
-                time = now.strftime('%H:%M')
-
-                if transcript_sit == "":
-                    transcript_sit = "empty"
-                if transcript_act == "":
-                    transcript_act = "empty"
-                if transcript_eff == "":
-                    transcript_eff = "empty"
-
-                parser.add_from_to_db(exel_path, st.session_state["tid"], audio_sit_path, audio_act_path, audio_eff_path, 
-                                      transcript_sit, transcript_act, transcript_eff, st.session_state["ti_student_id"], date.strftime("%d-%m-%Y"), time)
-
-                st.rerun()
+        st.rerun()
 
 
 elif st.session_state['authentication_status'] is False:

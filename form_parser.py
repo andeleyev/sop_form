@@ -219,7 +219,3 @@ class Parser():
             db.loc[len(db)] = new_row
             print("Updating the form meta database")
             db.to_csv(self.forms_meta_path, index=False)
-
-
-if __name__=="__main__": 
-     main()
