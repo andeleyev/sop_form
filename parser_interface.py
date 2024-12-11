@@ -5,7 +5,7 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 from streamlit_extras.stylable_container import stylable_container
-
+import os
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🧪", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -16,11 +16,12 @@ now = datetime.datetime.now()
 today = now.strftime("%d-%m-%Y")
 
 @st.cache_resource
-def initialize():
+def initialize(key):
+    os.environ["OPENAI_API_KEY"] = key
     parser = form_parser.Parser()
     return parser
 
-parser = initialize()
+parser = initialize(api)
 
 @st.cache_resource
 def get_teacher_data(username=None, id=None):
@@ -125,7 +126,7 @@ authenticator.login(fields={'Form name':'Login', 'Username':'вашето пот
 
 if st.session_state['authentication_status']:
     st.write(f'Welcome *{st.session_state["name"]}*')
-    st.write(f'KEy: {api}')
+
     username = st.session_state["username"]
     
     logged_teacher = get_teacher_data(username)  
