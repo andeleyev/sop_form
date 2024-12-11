@@ -1,0 +1,36 @@
+cookie:
+  expiry_days: 5
+  key: jncjdjnjddedesaasd
+  name: sop_form_cookie
+credentials:
+  usernames:
+    dimitar.ivanov:
+      email: mail_dummy
+      first_name: Dimitar
+      last_name: Ivanov
+      logged_in: false
+      password: $2b$12$Xm0VF3qhwQF/iktD7xtVbuJtuLpL3VqEeA.nkYnnpK0jAhumob9Oa
+    elena.p:
+      email: mail_dummy
+      first_name: Elena
+      last_name: Petrova
+      logged_in: false
+      password: $2b$12$NnhREmWU/eq4AC2tjT0Qe.YDHFxFTVqiGQLIpm/wuVEzrjCajfYdm
+    nikolay.s:
+      email: mail_dummy
+      first_name: Nikolay
+      last_name: Stefanov
+      logged_in: false
+      password: $2b$12$RsAIujyj2iF/NDmclz1leenXTM1RXV8RbZsmvX3X6nLN36sAbXN0G
+    gabrtiela.m:
+      email: mail_dummy
+      first_name: Gabriela
+      last_name: Marinova
+      logged_in: false
+      password: $2b$12$MYQ7WaAFFymabx.xWeNfnemxZm9VIAB.l5cUNTA35sfu4eHchk.0S
+    hristo.t:
+      email: mail_dummy
+      first_name: Hristo
+      last_name: Todorov
+      logged_in: false
+      password: $2b$12$4gqgjLv4dCIhfCiRGgVVb.QyDsT5rWiDyhGKKCd0ohvFFtm.aDZnm

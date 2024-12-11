@@ -1,6 +1,6 @@
 logging/
 .venv/
 console.py
-config.yaml
 secrets.toml
 __pycache__/
+./data/teacher.csv
