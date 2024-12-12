@@ -4,9 +4,9 @@ import form_parser
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-from streamlit_extras.stylable_container import stylable_container
 import os
 from streamlit_extras.bottom_container import bottom
+import io
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -20,9 +20,13 @@ today = now.strftime("%d-%m-%Y")
 def initialize(key):
     os.environ["OPENAI_API_KEY"] = key
     parser = form_parser.Parser()
-    return parser
 
-parser = initialize(api)
+    with open('config.yaml') as file:
+        config = yaml.load(file, Loader=SafeLoader)
+
+    return parser, config
+
+parser, config = initialize(api)
 
 @st.cache_resource
 def get_teacher_data(username=None, id=None):
@@ -57,9 +61,6 @@ def get_student_data(id):
         st.warning("Did not find the student in the database")
 
     return student
-
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
 
 # Pre-hashing all plain text passwords once
 #hashed = stauth.Hasher.hash_passwords(config['credentials'])
@@ -178,13 +179,16 @@ if st.session_state['authentication_status']:
 
         global parser
         audio_path = parser._get_unused_name(parser.voice_loggs, name)
-        with open(audio_path, "wb") as file:
-            print("saving audio: ", audio_path)
-            file.write(audio.getvalue())
-        
 
-        script = parser.transcript_speech(audio_path)
-        return script, audio_path
+        # Method 2: Using getvalue()
+        audio_bytes = audio.getvalue()
+        audio_file = io.BytesIO(audio_bytes).
+        #with open(audio_path, "wb") as file:
+        #    print("saving audio: ", audio_path)
+        #    file.write(audio.getvalue())
+        
+        script = parser.transcript_speech(audio_file)
+        return script, "None"
 
     # Form layout
     st.markdown("## Идентификационна информация\n\n ##### Вашият уникален анонимен идентификатор:")
@@ -208,18 +212,7 @@ if st.session_state['authentication_status']:
     a1, a2 = st.columns([5, 1])
 
     with a2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ):  
-            audio_sit = st.audio_input("aa", key=st.session_state["audi_sit_key"], label_visibility="collapsed")
-
+        audio_sit = st.audio_input("aa", key=st.session_state["audi_sit_key"], label_visibility="collapsed")
         transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio_{today}.mp3")
         if transcript_sit != "":
             print("test")
@@ -232,17 +225,7 @@ if st.session_state['authentication_status']:
     "(за гласов запис натиснете микрофона)"
     b1, b2 = st.columns([5, 1])
     with b2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ): 
-            audio_act = st.audio_input("действия", key=st.session_state["audi_act_key"], label_visibility="collapsed")
+        audio_act = st.audio_input("действия", key=st.session_state["audi_act_key"], label_visibility="collapsed")
         transcript_act, audio_act_path = transcribe(audio_act, f"action_audio_{today}.mp3")
         if transcript_act != "":
             st.session_state["text_act"] = transcript_act
@@ -253,17 +236,7 @@ if st.session_state['authentication_status']:
     "(за гласов запис натиснете микрофона)",
     c1, c2 = st.columns([5, 1])
     with c2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ): 
-            audio_eff = st.audio_input("как се е развила ситуацията", key=st.session_state["audi_eff_key"], label_visibility="collapsed")
+        audio_eff = st.audio_input("как се е развила ситуацията", key=st.session_state["audi_eff_key"], label_visibility="collapsed")
         transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio_{today}.mp3")
         if transcript_eff != "":
             st.session_state["text_eff"] = transcript_eff
@@ -334,14 +307,7 @@ if st.session_state['authentication_status']:
         # print(st.session_state.exel)
         time = now.strftime('%H:%M')
 
-        if transcript_sit == "":
-            transcript_sit = "empty"
-        if transcript_act == "":
-            transcript_act = "empty"
-        if transcript_eff == "":
-            transcript_eff = "empty"
-
-        parser.add_from_to_db(exel_path, st.session_state["tid"], audio_sit_path, audio_act_path, audio_eff_path, 
+        parser.add_form_to_db(exel_path, st.session_state["tid"], audio_sit_path, audio_act_path, audio_eff_path, 
                                 transcript_sit, transcript_act, transcript_eff, st.session_state["ti_student_id"], date.strftime("%d-%m-%Y"), time)
 
         

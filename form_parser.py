@@ -7,6 +7,7 @@ import openai
 import pandas as pd
 from streamlit_authenticator import Hasher
 import yaml
+import datetime
 
 # Define the field in the form where the inputs are
 teacher_id = 'B6'
@@ -99,12 +100,12 @@ class Parser():
         
         return os.path.isfile(path)
 
-    def transcript_speech(self, speech_path):
+    def transcript_speech(self, speech):
         #if self.transcriptor == "local":
         #    result = self.model.transcribe(speech_path, language="bg")
         #    transcript = result["text"]
         #else:
-            audio_file= open(speech_path, "rb")
+            audio_file= open(speech, "rb")
             result = self.model.audio.transcriptions.create(
             model="whisper-1", 
             file=audio_file,
@@ -202,12 +203,30 @@ class Parser():
         return id in self.dynamic_db['id'].values
 
 
-    def add_from_to_db(self, from_path, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id, date, time):
+    def add_form_to_db(self, from_path, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id):
         # row = form_id,from_path,date,time,audio_sit,audio_action,audio_effect,transcript_sit,transcript_action,transcript_effect,teacher_id,student_id
+        
+        time = datetime.now()
         print(time)
-        form_id = hash(t_id + s_id + date + time) 
+        form_id = hash(t_id + s_id + time) 
 
-        new_row = [form_id, from_path, date, time,
+        
+        if transcript_sit == "":
+            transcript_sit = "empty"
+        if transcript_act == "":
+            transcript_act = "empty"
+        if transcript_eff == "":
+            transcript_eff = "empty"
+
+        if audio_sit == "":
+            audio_sit = "None"
+        if audio_act == "":
+            audio_act = "None"
+        if audio_eff == "":
+            audio_eff = "None"
+
+
+        new_row = [form_id, from_path, time,
                    audio_sit, audio_act, audio_eff,
                    script_sit, script_act, script_eff, 
                    t_id, s_id]
