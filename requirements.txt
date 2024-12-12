@@ -4,3 +4,4 @@ openai
 streamlit-authenticator
 pandas
 streamlit-extras
+streamlit-audiorec
