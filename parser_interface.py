@@ -7,6 +7,7 @@ from yaml.loader import SafeLoader
 from streamlit_extras.stylable_container import stylable_container
 import os
 from streamlit_extras.bottom_container import bottom
+from st_audiorec import st_audiorec
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -270,7 +271,7 @@ if st.session_state['authentication_status']:
     with c1:
         st.text_area("Опишете ефекта от вашата реакция:", key="text_eff", height=257, label_visibility="collapsed")
 
-    st.markdown("#### Оценете ефекта от вашата реакция от 1 до 10:")
+    st.markdown("#### Оценете ефекта от вашата реакция от 1 до 5:")
     #e1, e2 = st.columns([5, 1])
     #with e1:
     #    st.markdown("#### Оценете ефекта от вашата реакция от 1 до 10:")
@@ -309,6 +310,11 @@ if st.session_state['authentication_status']:
         st.session_state.balloons = False
         st.balloons()
         st.toast("Формулара е испратен", icon='🥳') 
+
+    wav_audio = st_audiorec()
+
+    if wav_audio is not None:
+        st.audio(wav_audio, format="audio/wav")
 
     if submit:
         st.session_state.download = True
