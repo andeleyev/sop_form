@@ -278,7 +278,7 @@ if st.session_state['authentication_status']:
     #with e2:
     #    st.info("инфо")
     
-    explain_grades = """# скала за оценяване
+    explain_grades = """# скала за оценяване:
 
     1: влоши ситуацията
     2: неефективна
