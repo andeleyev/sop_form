@@ -278,13 +278,15 @@ if st.session_state['authentication_status']:
     #with e2:
     #    st.info("инфо")
     
-    explain_grades = """# whaat
-    aint no way
-    aаааааааааin no way
+    explain_grades = """# скала за оценяване
 
-    that going fucking viral
+    1: влоши ситуацията
+    2: неефективна
+    3: слабо ефективна
+    4: ефективна
+    5: много ефективна
     """
-    st.slider("(за повече информацуя натиснете вапроцителния знак) ", 1, 5, key="slider", help=explain_grades, label_visibility="visible")
+    st.slider("(за повече информация натиснете въпросителния знак) ", 1, 5, key="slider", help=explain_grades, label_visibility="visible")
 
     st.markdown("## Информация за специалиста и детето \n\n #### Колко години опит имате:")
     st.text_input("Колко години опит имате:", key="ti_xp", label_visibility="collapsed")
