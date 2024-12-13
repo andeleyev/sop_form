@@ -4,3 +4,4 @@ console.py
 secrets.toml
 __pycache__/
 ./data/teacher.csv
+exel_col.txt

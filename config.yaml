@@ -4,33 +4,21 @@ cookie:
   name: sop_form_cookie
 credentials:
   usernames:
-    dimitar.ivanov:
-      email: mail_dummy
-      first_name: Dimitar
-      last_name: Ivanov
+    dimitar.i:
+      email: mail_dummy@gmail.com
+      first_name: "\u0414\u0438\u043C\u0438\u0442\u044A\u0440"
+      last_name: "\u0418\u0432\u0430\u043D\u043E\u0432"
       logged_in: false
-      password: $2b$12$Xm0VF3qhwQF/iktD7xtVbuJtuLpL3VqEeA.nkYnnpK0jAhumob9Oa
+      password: $2b$12$mMXEzCz0Aqwtb/laCHbu7OZmTzi21feMZXSfX8FEKuz7wOQpXdxyu
+    gabriela.m:
+      email: mail_dummy@gmail.com
+      first_name: "\u0413\u0430\u0431\u0440\u0438\u0435\u043B\u0430"
+      last_name: "\u041C\u0430\u0440\u0438\u043D\u043E\u0432\u0430"
+      logged_in: false
+      password: $2b$12$lK.AvC7QVNZMVuyLmgdBfu2ypN.q/.EjUsoR5ppGPkvGmqwIWNsCe
     elena.p:
-      email: mail_dummy
-      first_name: Elena
-      last_name: Petrova
+      email: mail_dummy@gmail.com
+      first_name: "\u0415\u043B\u0435\u043D\u0430"
+      last_name: "\u041F\u0435\u0442\u0440\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$NnhREmWU/eq4AC2tjT0Qe.YDHFxFTVqiGQLIpm/wuVEzrjCajfYdm
-    nikolay.s:
-      email: mail_dummy
-      first_name: Nikolay
-      last_name: Stefanov
-      logged_in: false
-      password: $2b$12$RsAIujyj2iF/NDmclz1leenXTM1RXV8RbZsmvX3X6nLN36sAbXN0G
-    gabrtiela.m:
-      email: mail_dummy
-      first_name: Gabriela
-      last_name: Marinova
-      logged_in: false
-      password: $2b$12$MYQ7WaAFFymabx.xWeNfnemxZm9VIAB.l5cUNTA35sfu4eHchk.0S
-    hristo.t:
-      email: mail_dummy
-      first_name: Hristo
-      last_name: Todorov
-      logged_in: false
-      password: $2b$12$4gqgjLv4dCIhfCiRGgVVb.QyDsT5rWiDyhGKKCd0ohvFFtm.aDZnm
+      password: $2b$12$aIQ6QILdKQJL9UvEL4UHC.KAazYgsrXNH5KzPzn9BW7K6MPPFnvju
