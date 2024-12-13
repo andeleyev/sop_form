@@ -5,3 +5,4 @@ secrets.toml
 __pycache__/
 ./data/teacher.csv
 credentials.json
+exel_col.txt
