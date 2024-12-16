@@ -7,9 +7,8 @@ from yaml.loader import SafeLoader
 from streamlit_extras.stylable_container import stylable_container
 import os
 from streamlit_extras.bottom_container import bottom
-from st_audiorec import st_audiorec
-import gdown
-from bs4 import BeautifulSoup
+# from st_audiorec import st_audiorec
+from audio_recorder_streamlit import audio_recorder
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -29,8 +28,6 @@ def initialize(key):
 
 parser, student_ids = initialize(api)
 
-print(student_ids)
-
 @st.cache_resource
 def get_teacher_data(username):
     global parser
@@ -48,82 +45,60 @@ def get_teacher_data(username):
 
     return teacher_id, teacher_xp, 
 
-def extract_file_name_from_html(url):
-    output = 'test.html'
-    global parser
-    parser.download(url, output)
-
-    try:
-        with open(output, 'r', encoding='utf-8') as file:
-            content = file.read()
-            
-        # Parse the HTML content
-        soup = BeautifulSoup(content, 'html.parser')
-
-        # Find the <meta> tag with property "og:title"
-        meta_tag = soup.find('meta', property='og:title')
-
-        if meta_tag and 'content' in meta_tag.attrs:
-            return meta_tag['content']
-
-        return None
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-
 @st.cache_resource
 def get_student_data(id):
     global parser
     students = parser.students
-    print(students)
     student = students.loc[students['Идентификационен номер'] == str(id)]
     print(student)
+    sp = dict()
     if not student.empty:
-        url = str(student['линк към файл с профил'].values[0])
-        print(url)
-        st.session_state['ti_profile'] = url
-        file = parser.get_filename(url)
+        student = student.iloc[-1]
+        sp['age'] = (now.year - int(student['Година на раждане']))
+
+        sp['url'] = str(student['линк към файл с профил'])
+        # print(url)
+        st.session_state['ti_profile'] = sp['url']
+        file = parser.get_filename(sp['url'])
         if file == None:
             file = "link"
         st.session_state['profile_filename'] = file
 
-        autism = bool(int(student['аутизъм'].values[0]))
-        dislexia = bool(int(student['дислекция'].values[0]))
-        ns1 = bool(int(student['нз1'].values[0]))
-        ns2 = bool(int(student['нз2'].values[0]))
-        ns3 = bool(int(student['нз3'].values[0]))
-        ns4 = bool(int(student['нз4'].values[0])) 
-        ns5 = bool(int(student['нз5'].values[0])) 
-        ns6 = bool(int(student['нз6'].values[0])) 
-        ns7 = bool(int(student['нз7'].values[0])) 
-        ns8 = bool(int(student['нз8'].values[0])) 
-        ns9 = bool(int(student['нз9'].values[0]))        
-        ns10 = bool(int(student['нз10'].values[0])) 
-        ns11 = bool(int(student['нз11'].values[0]))
-        ns12 = bool(int(student['нз12'].values[0])) 
+        sp['autism'] = bool(int(student['аутизъм']))
+        sp['dislexia'] = bool(int(student['дислекция']))
+        sp['ns1'] = bool(int(student['нз1']))
+        sp['ns2'] = bool(int(student['нз2']))
+        sp['ns3'] = bool(int(student['нз3']))
+        sp['ns4'] = bool(int(student['нз4'])) 
+        sp['ns5'] = bool(int(student['нз5'])) 
+        sp['ns6'] = bool(int(student['нз6'])) 
+        sp['ns7'] = bool(int(student['нз7'])) 
+        sp['ns8'] = bool(int(student['нз8'])) 
+        sp['ns9'] = bool(int(student['нз9']))        
+        sp['ns10'] = bool(int(student['нз10'])) 
+        sp['ns11'] = bool(int(student['нз11']))
+        sp['ns12'] = bool(int(student['нз12'])) 
 
-        st.session_state['autism'] = autism
-        st.session_state['dislexia'] = dislexia
-        st.session_state['ns1'] = ns1
-        st.session_state['ns2'] = ns2
-        st.session_state['ns3'] = ns3
-        st.session_state['ns4'] = ns4
-        st.session_state['ns5'] = ns5
-        st.session_state['ns6'] = ns6
-        st.session_state['ns7'] = ns7
-        st.session_state['ns8'] = ns8
-        st.session_state['ns9'] = ns9     
-        st.session_state['ns10'] = ns10
-        st.session_state['ns11'] = ns11
-        st.session_state['ns12'] = ns12
+        st.session_state['autism'] = sp['autism']
+        st.session_state['dislexia'] = sp['dislexia']
+        st.session_state['ns1'] = sp['ns1']
+        st.session_state['ns2'] = sp['ns2'] 
+        st.session_state['ns3'] = sp['ns3'] 
+        st.session_state['ns4'] = sp['ns4'] 
+        st.session_state['ns5'] = sp['ns5'] 
+        st.session_state['ns6'] = sp['ns6'] 
+        st.session_state['ns7'] = sp['ns7'] 
+        st.session_state['ns8'] = sp['ns8'] 
+        st.session_state['ns9'] = sp['ns9']     
+        st.session_state['ns10'] = sp['ns10']
+        st.session_state['ns11'] = sp['ns11']
+        st.session_state['ns12'] = sp['ns12']
 
-        student_profile = [url, autism, dislexia, ns1, ns2, ns3, ns4, ns5, ns6, ns7, ns8, ns9, ns10, ns11, ns12]
     else:
         st.warning("Did not find the student in the database")
-        return None
+        return None, None
 
-    return student_profile, file
+    return sp, file
 
 # Login in Funitonality
 with open('config.yaml') as file:
@@ -231,15 +206,15 @@ if st.session_state['authentication_status']:
     # audio_st = st.audio_input("🎤 Говори", key=f"voice_input_{st.session_state.audio_key}")
 
     @st.cache_data
-    def transcribe(audio, name):
+    def transcribe(audio, audio_path):
         if not audio:
             return "", "None"
 
         global parser
-        audio_path = parser._get_unused_name(parser.voice_loggs, name)
+
         with open(audio_path, "wb") as file:
             print("saving audio: ", audio_path)
-            file.write(audio.getvalue())
+            file.write(audio)
         
 
         script = parser.transcript_speech(audio_path)
@@ -252,10 +227,10 @@ if st.session_state['authentication_status']:
     #    teacher_form = get_teacher_data(id=st.session_state["tid"])
 
     st.markdown("##### Уникален анонимен номер на детето:")
-    student = st.selectbox("b", student_ids, key="sid", label_visibility="collapsed", index=None)
+    s = st.selectbox("b", student_ids, key="sid", label_visibility="collapsed", index=None)
     
-    if st.session_state["sid"]:
-        student_pr, file = get_student_data(int(student))
+    if s:
+        student_pr, file = get_student_data(int(st.session_state["sid"]))
         new_student_pr = student_pr.copy()
         if file == "link":
             st.toast("The URL to the student card could not be loaded correctly", icon="❗")
@@ -272,24 +247,24 @@ if st.session_state['authentication_status']:
 
     "#### **Опишете устно или писмено ситуацията, която се е случила:**"
     "(за гласов запис натиснете микрофона)"
-    a1, a2 = st.columns([5, 1])
+    a1, a2 = st.columns([7, 1])
 
     with a2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ):  
-            audio_sit = st.audio_input("aa", key=st.session_state["audi_sit_key"], label_visibility="collapsed")
-
-        transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio_{today}.mp3")
+        #with stylable_container(
+        #    key="orange",
+        #    css_styles="""
+        #        button {
+        #            background-color: green;
+        #            color: white;
+        #            border-radius: 20px;
+        #        }
+        #        """,
+        #):  
+        #    audio_sit = st.audio_input("aa", key=st.session_state["audi_sit_key"], label_visibility="collapsed")
+        audio_sit = audio_recorder("", key=st.session_state['audi_sit_key'], pause_threshold=-1.)
+        transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio.mp3")
         if transcript_sit != "":
-            print("test")
+            # print("test")
             st.session_state["text_sit"] = transcript_sit
     with a1:
         st.text_area("ситуацията", key="text_sit", placeholder="write here", height=257, label_visibility="collapsed")
@@ -297,20 +272,21 @@ if st.session_state['authentication_status']:
     "  "
     "#### **Опишете устно или писмено Вашата реакция:**"
     "(за гласов запис натиснете микрофона)"
-    b1, b2 = st.columns([5, 1])
+    b1, b2 = st.columns([7, 1])
     with b2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ): 
-            audio_act = st.audio_input("действия", key=st.session_state["audi_act_key"], label_visibility="collapsed")
-        transcript_act, audio_act_path = transcribe(audio_act, f"action_audio_{today}.mp3")
+        #with stylable_container(
+        #    key="orange",
+        #    css_styles="""
+        #        button {
+        #            background-color: green;
+        #            color: white;
+        #            border-radius: 20px;
+        #        }
+        #        """,
+        #): 
+        #    audio_act = st.audio_input("действия", key=st.session_state["audi_act_key"], label_visibility="collapsed")
+        audio_act = audio_recorder("", key=st.session_state['audi_act_key'])
+        transcript_act, audio_act_path = transcribe(audio_act, f"action_audio.mp3")
         if transcript_act != "":
             st.session_state["text_act"] = transcript_act
     with b1:
@@ -318,20 +294,23 @@ if st.session_state['authentication_status']:
 
     "#### Опишете устно или писмено **ефекта** от Вашата реакция:"
     "(за гласов запис натиснете микрофона)",
-    c1, c2 = st.columns([5, 1])
+    c1, c2 = st.columns([7, 1])
     with c2:
-        with stylable_container(
-            key="orange",
-            css_styles="""
-                button {
-                    background-color: green;
-                    color: white;
-                    border-radius: 20px;
-                }
-                """,
-        ): 
-            audio_eff = st.audio_input("как се е развила ситуацията", key=st.session_state["audi_eff_key"], label_visibility="collapsed")
-        transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio_{today}.mp3")
+        #'''
+        #with stylable_container(
+        #    key="orange",
+        #    css_styles="""
+        #        button {
+        #            background-color: green;
+        #            color: white;
+        #            border-radius: 20px;
+        #        }
+        #        """,
+        #): 
+        #    audio_eff = st.audio_input("как се е развила ситуацията", key=st.session_state["audi_eff_key"], label_visibility="collapsed")
+        #'''
+        audio_eff = audio_recorder("", key=st.session_state['audi_eff_key'])
+        transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio.mp3")
         if transcript_eff != "":
             st.session_state["text_eff"] = transcript_eff
     with c1:
@@ -359,13 +338,12 @@ if st.session_state['authentication_status']:
         labels = ("лоша реакция", "неефективна реакция", "слабо ефективна реакция", "ефективна реакция", "много ефективна реакция")
         return labels[g - 1]
 
-    grade = st.radio(
-        "How would you like to be contacted?", grades, format_func=grade_to_label, index=None, label_visibility="collapsed")
+    grade = st.radio("?", grades, key="grade", format_func=grade_to_label, index=None, label_visibility="collapsed")
 
 
     st.markdown("#### Състояние на детето")
 
-    if not st.session_state['ti_profile'] == "":
+    if s is not None:
 
         f1, f2, f3 = st.columns(3)
 
@@ -390,7 +368,8 @@ if st.session_state['authentication_status']:
             st.checkbox("нз10", key="ns10")
 
 
-        st.markdown("#### Какъв е линкът към картата за функционална оценка на детето:")
+        st.markdown("#### Линкът към картата за функционална оценка на детето:")
+        st.markdown("###### При нова версия ви молим за доставка")
         #st.text_input("профилът", key="ti_profile", label_visibility="collapsed")
         st.link_button(st.session_state['profile_filename'], st.session_state['ti_profile'])
 
@@ -398,60 +377,79 @@ if st.session_state['authentication_status']:
 
         submit = st.button("подаване на формуляр", type="primary", use_container_width=True)
 
-        if not "ballons" in st.session_state:
+        if not "balloons" in st.session_state:
             st.session_state.balloons = False
 
         if st.session_state.balloons:
-            st.session_state.balloons = False
+            
             st.balloons()
             st.toast("Формулярът е изпратен", icon='🥳') 
 
-        wav_audio = st_audiorec()
-
-        if wav_audio is not None:
-            st.audio(wav_audio, format="audio/wav")
+            st.session_state.balloons = False
 
         if submit:
-            st.session_state.download = True
-            st.session_state.balloons = True
+            def check_filled():
+                if st.session_state['sid'] is None:
+                    return False
+                if st.session_state['ti_xp_toghether'] == "":
+                    return False
+                if st.session_state['text_sit'] == "":
+                    return False
+                if st.session_state['text_act'] == "":
+                    return False
+                if st.session_state['text_eff'] == "":
+                    return False
+                if st.session_state['grade'] == None:
+                    return False
+                return True
 
-            update = not new_student_pr == student_pr
-            print(update)
+            if check_filled():
 
-            inputs = {
-                "teacher_id": teacher_id,
-                "student_id": st.session_state["sid"],
-                "date": date.strftime("%d-%m-%Y"),
-                "teacher_xp": st.session_state["ti_xp"],
-                "student_age": st.session_state["ti_age"],
-                "xp_with_child": st.session_state["ti_xp_toghether"],
-                "student_profile": st.session_state["ti_profile"],
-                "situation": st.session_state["text_sit"],
-                "action": st.session_state["text_act"],
-                "effect": st.session_state["text_eff"],
-                "grade": st.session_state['slider']
-            }
-
-            exel, exel_path = parser.write_to_exel(inputs)
-            if not exel is None:
+                st.session_state.download = True
                 st.session_state.balloons = True
-            st.session_state.exel = exel
-            # print(st.session_state.exel)
-            time = now.strftime('%H:%M')
 
-            if transcript_sit == "":
-                transcript_sit = "empty"
-            if transcript_act == "":
-                transcript_act = "empty"
-            if transcript_eff == "":
-                transcript_eff = "empty"
+                update = not (new_student_pr == student_pr)
+                print(update)
 
-            parser.add_from_to_db(exel_path, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
-                                    transcript_sit, transcript_act, transcript_eff, st.session_state["ti_student_id"], date.strftime("%d-%m-%Y"), time)
+                inputs_exel = {
+                    "teacher_id": teacher_id,
+                    "student_id": st.session_state["sid"],
+                    "date": date.strftime("%d-%m-%Y"),
+                    "teacher_xp": teacher_xp,
+                    "student_age": student_pr['age'],
+                    "xp_with_child": st.session_state["ti_xp_toghether"],
+                    "student_profile": st.session_state["ti_profile"],
+                    "situation": st.session_state["text_sit"],
+                    "action": st.session_state["text_act"],
+                    "effect": st.session_state["text_eff"],
+                    "grade": st.session_state['grade']
+                }
 
-            st.rerun()
+                inputs_ = {
+                    "kid_profile": student_pr,
+                    "situation": st.session_state["text_sit"],
+                    "action": st.session_state["text_act"],
+                    "effect": st.session_state["text_eff"],
+                    "grade": st.session_state['grade']
+                }
+
+                exel = parser.create_exel(inputs_exel)
+                parser.save_scenario()
+                if not exel is None:
+                    st.session_state.balloons = True
+                st.session_state.exel = exel
+                # print(st.session_state.exel)
+                time = now.strftime('%H:%M')
+
+                parser.add_form_to_db(teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
+                                        transcript_sit, transcript_act, transcript_eff, st.session_state["sid"])
+
+                st.rerun()
+            else:
+                st.toast("Има още празни полета", icon="❗")
     else:
         st.warning("Моля изберете ученик")
+        
         
 
 

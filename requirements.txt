@@ -5,3 +5,10 @@ streamlit-authenticator
 pandas
 streamlit-extras
 streamlit-audiorec
+audio-recorder-streamlit
+gspread-dataframe
+gspread
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client

@@ -4,14 +4,15 @@ import io
 import os
 import openai
 # import whisper
+from datetime import datetime
 import pandas as pd
 from streamlit_authenticator import Hasher
 import yaml
 import re
 
-
-import gdown
-from bs4 import BeautifulSoup
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
+# import gdown
+# from bs4 import BeautifulSoup
 import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
@@ -63,16 +64,16 @@ class Parser():
         client =  gspread.authorize(credentials)
         self.client = client
         
-        sheet_meta = client.open_by_key("1Rqw51AqqepG78FmrN1UqiWvwPS5ITpzSCA1Bx4WDmkU").sheet1
-        data_meta = sheet_meta.get_all_values()
+        self.sheet_meta = client.open_by_key("1Rqw51AqqepG78FmrN1UqiWvwPS5ITpzSCA1Bx4WDmkU").sheet1
+        data_meta = self.sheet_meta.get_all_values()
         self.forms_meta =pd.DataFrame(data_meta[1:], columns=data_meta[0])
 
-        sheet_teacher = client.open_by_key("1l44B3aAaLWZhJOtWDjWkCLz89wTTk71fjai8_URV68k").sheet1
-        data_teacher = sheet_teacher.get_all_values()
+        self.sheet_teacher = client.open_by_key("1l44B3aAaLWZhJOtWDjWkCLz89wTTk71fjai8_URV68k").sheet1
+        data_teacher = self.sheet_teacher.get_all_values()
         self.teachers = pd.DataFrame(data_teacher[1:], columns=data_teacher[0])
         
-        sheeet_student = client.open_by_key("1BcsZPL-CKhOmBYWc96cuK594Zau1anQhdaBCQTUAsHU").sheet1
-        data_student = sheeet_student.get_all_values()
+        self.sheeet_student = client.open_by_key("1BcsZPL-CKhOmBYWc96cuK594Zau1anQhdaBCQTUAsHU").sheet1
+        data_student = self.sheeet_student.get_all_values()
         self.students = pd.DataFrame(data_student[1:], columns=data_student[0])
 
         self.logging = logging
@@ -100,13 +101,15 @@ class Parser():
             else: 
                 first, second = row['Име на учител'], " - "
             user_id = str(row["username"])
+            pwd = row["pwd"].strip()
             credentials["usernames"][user_id] = {
                 "email": row["Електронна Поща"],
                 "first_name": first,
                 "last_name": second,
                 "logged_in": False,
-                "password": row['pwd'],
+                "password": pwd,
             }
+            print(row["username"],":",pwd, sep="")
 
         # Create the YAML structure
         config = {
@@ -240,12 +243,29 @@ class Parser():
                 if not path in dir:
                     return os.path.join(folder, path)
 
-    def add_from_to_db(self, from_path, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id, date, time):
+    def add_form_to_db(self, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id):
         # row = form_id,from_path,date,time,audio_sit,audio_action,audio_effect,transcript_sit,transcript_action,transcript_effect,teacher_id,student_id
+       
+        time = datetime.now()
         print(time)
-        form_id = hash(t_id + s_id + date + time) 
+        form_id = hash(str(t_id) + str(s_id) + str(time)) 
+        cr_date, cr_time = time.strftime("%Y-%m-%d"), time.strftime("%H:%M")
 
-        new_row = [form_id, from_path, date, time,
+        if script_sit == "":
+            script_sit = "empty"
+        if script_act == "":
+            script_act = "empty"
+        if script_eff == "":
+            script_eff = "empty"
+
+        if audio_sit == "":
+            audio_sit = "None"
+        if audio_act == "":
+            audio_act = "None"
+        if audio_eff == "":
+            audio_eff = "None"
+
+        new_row = [form_id, cr_date, cr_time,
                    audio_sit, audio_act, audio_eff,
                    script_sit, script_act, script_eff, 
                    t_id, s_id]
@@ -256,4 +276,4 @@ class Parser():
         if form_id not in db['form_id'].to_list():
             db.loc[len(db)] = new_row
             print("Updating the form meta database")
-            db.to_csv(self.forms_meta_path, index=False)
+            set_with_dataframe(self.sheet_meta, db)

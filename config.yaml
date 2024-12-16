@@ -9,16 +9,16 @@ credentials:
       first_name: "\u0414\u0438\u043C\u0438\u0442\u044A\u0440"
       last_name: "\u0418\u0432\u0430\u043D\u043E\u0432"
       logged_in: false
-      password: $2b$12$mMXEzCz0Aqwtb/laCHbu7OZmTzi21feMZXSfX8FEKuz7wOQpXdxyu
+      password: $2b$12$sxncjs8EreDl9KxHMXkdq.Mt97X71fWQOEjHsBQ.4Ri1gPRvznGMa
     gabriela.m:
       email: mail_dummy@gmail.com
       first_name: "\u0413\u0430\u0431\u0440\u0438\u0435\u043B\u0430"
       last_name: "\u041C\u0430\u0440\u0438\u043D\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$lK.AvC7QVNZMVuyLmgdBfu2ypN.q/.EjUsoR5ppGPkvGmqwIWNsCe
+      password: $2b$12$HtsFKgpr4uBOhvaK6W561.2IGbn72s.BcCLFhjpNj8uPmMvavJK.i
     elena.p:
       email: mail_dummy@gmail.com
       first_name: "\u0415\u043B\u0435\u043D\u0430"
       last_name: "\u041F\u0435\u0442\u0440\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$aIQ6QILdKQJL9UvEL4UHC.KAazYgsrXNH5KzPzn9BW7K6MPPFnvju
+      password: $2b$12$ZTyr9zroF0OaaQr4O0rGI.bURWFJmF5qaXF9jCOJGx3.G7L6W.WGi
