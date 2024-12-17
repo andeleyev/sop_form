@@ -15,10 +15,10 @@ from gspread_dataframe import get_as_dataframe, set_with_dataframe
 # from bs4 import BeautifulSoup
 import gspread
 from google.oauth2.service_account import Credentials
-import pandas as pd
-import json
 import streamlit as st
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+
 
 
 # in secrets.toml service account
@@ -148,36 +148,6 @@ class Parser():
             transcript = result.text
 
             return transcript
-    
-    def wb_to_dict(self, path_form):
-        workbook = openpyxl.load_workbook(path_form)
-        sheet = workbook.active
-
-        # Extract data manually
-        data = {
-            'teacher_id': sheet[teacher_id].value,
-            'student_id': sheet[student_id].value,
-            'date': sheet[date_of_scenario].value,
-            'teacher_xp': sheet[teacher_experience].value,
-            'student_age': sheet[student_age].value,
-            'xp_with_child': sheet[teacher_exp_with_student].value,
-            'student_profile': sheet[student_profile].value,
-            'situation': sheet[situation].value,
-            'action': sheet[action_taken].value,
-            'effect': sheet[effect].value,
-            'grade': sheet[rating].value
-        }
-
-        scenario = {
-            "Student Profile": {
-                "Age": student_age,
-            },
-            "Situation": situation,
-            "Action Taken": action_taken,
-            "Effectiveness in regards to the general aim": rating
-        }
-
-        return data, scenario
 
     def dict_to_wb(self, wb_template, inputs):
         workbook = openpyxl.load_workbook(wb_template)
@@ -212,6 +182,63 @@ class Parser():
             return
         
         return self.dict_to_wb(template, inputs)
+    
+    def karta_to_drive(self, file_path):
+        """Upload card functional grade to Google Drive."""
+
+        folder_cards = "1F2oiBQzZt1ko7DhaVIeO4VR-5RrJDNlk"
+        try:
+            with build("drive", "v3", credentials=credentials) as service:            
+                file_metadata = {'name': os.path.basename(file_path), "parents": [folder_cards]}
+                media = MediaFileUpload(file_path, resumable=True)
+                
+                file = service.files().create(
+                    body=file_metadata, 
+                    media_body=media, 
+                    fields='id'
+                ).execute()
+                
+                return file.get('id')
+        except Exception as e:
+            st.error(f"Error uploading file: {e}")
+            return None
+        
+    def add_student_to_db(self, student, teacher_id, student_id):
+        student['date of entry'] = datetime.today().strftime("%d.%m.%Y")
+        student['id teacher'] = teacher_id
+        student['id student'] = student_id
+
+        self.students.loc[len(self.students)] = student
+        set_with_dataframe(self.sheeet_student, self.students)
+
+
+        
+    
+    def save_scenario(self, dict, file_name):
+        name = file_name
+
+        with open(name, 'w') as json_file:
+            json.dump(dict, json_file, indent=4)
+        
+        # Prepare file metadata
+        folder_id = "1HeAv4-zn--7IUxZZY4MgMb2lb_YdFCsD"
+        file_metadata = {'name': "scenario.json", 'parents': [folder_id]}
+        
+        # Upload file to Google Drive
+        with build("drive", "v3", credentials=credentials) as service:
+            media = MediaFileUpload(name, resumable=True)
+            file = service.files().create(
+                body=file_metadata, 
+                media_body=media, 
+                fields='id'
+            ).execute()
+        
+        os.remove(file_name)
+        print(f'File ID: {file.get("id")}')
+        return file.get('id')
+
+    def create_google_drive_link(self, file_id):
+        return f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
 
     def extract_file_id(self, url):
         # Regular expression for Google Drive file ID
@@ -243,13 +270,14 @@ class Parser():
                 if not path in dir:
                     return os.path.join(folder, path)
 
-    def add_form_to_db(self, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id):
+    def add_form_to_db(self, form, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id):
         # row = form_id,from_path,date,time,audio_sit,audio_action,audio_effect,transcript_sit,transcript_action,transcript_effect,teacher_id,student_id
        
+
         time = datetime.now()
         print(time)
         form_id = hash(str(t_id) + str(s_id) + str(time)) 
-        cr_date, cr_time = time.strftime("%Y-%m-%d"), time.strftime("%H:%M")
+        cr_date, cr_time = time.strftime("%d-%m-%Y"), time.strftime("%H:%M")
 
         if script_sit == "":
             script_sit = "empty"
@@ -265,6 +293,9 @@ class Parser():
         if audio_eff == "":
             audio_eff = "None"
 
+        drive_form_id = self.save_scenario(form, f"scenario-{cr_date}-sid:{s_id}.json")
+        form['id'] = drive_form_id
+
         new_row = [form_id, cr_date, cr_time,
                    audio_sit, audio_act, audio_eff,
                    script_sit, script_act, script_eff, 
@@ -277,3 +308,38 @@ class Parser():
             db.loc[len(db)] = new_row
             print("Updating the form meta database")
             set_with_dataframe(self.sheet_meta, db)
+
+        return bool(drive_form_id)
+    
+
+    '''
+    def wb_to_dict(self, path_form):
+        workbook = openpyxl.load_workbook(path_form)
+        sheet = workbook.active
+
+        # Extract data manually
+        data = {
+            'teacher_id': sheet[teacher_id].value,
+            'student_id': sheet[student_id].value,
+            'date': sheet[date_of_scenario].value,
+            'teacher_xp': sheet[teacher_experience].value,
+            'student_age': sheet[student_age].value,
+            'xp_with_child': sheet[teacher_exp_with_student].value,
+            'student_profile': sheet[student_profile].value,
+            'situation': sheet[situation].value,
+            'action': sheet[action_taken].value,
+            'effect': sheet[effect].value,
+            'grade': sheet[rating].value
+        }
+
+        scenario = {
+            "Student Profile": {
+                "Age": data[student_age],
+            },
+            "Situation": situation,
+            "Action Taken": action_taken,
+            "Effectiveness in regards to the general aim": rating
+        }
+
+        return data, scenario
+    '''
