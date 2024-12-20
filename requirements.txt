@@ -3,7 +3,6 @@ streamlit
 openai
 streamlit-authenticator
 pandas
-streamlit-audiorec
 audio-recorder-streamlit
 gspread-dataframe
 gspread

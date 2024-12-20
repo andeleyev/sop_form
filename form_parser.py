@@ -66,7 +66,7 @@ class Parser():
         
         self.sheet_meta = client.open_by_key("1Rqw51AqqepG78FmrN1UqiWvwPS5ITpzSCA1Bx4WDmkU").sheet1
         data_meta = self.sheet_meta.get_all_values()
-        self.forms_meta =pd.DataFrame(data_meta[1:], columns=data_meta[0])
+        self.forms_meta = pd.DataFrame(data_meta[1:], columns=data_meta[0])
 
         self.sheet_teacher = client.open_by_key("1l44B3aAaLWZhJOtWDjWkCLz89wTTk71fjai8_URV68k").sheet1
         data_teacher = self.sheet_teacher.get_all_values()
@@ -78,9 +78,7 @@ class Parser():
 
         self.logging = logging
         self.voice_loggs = "17sNd1INEALhXbEiA5jklEu68SoZverUm"
-        self.transcript_loggs = "1Axk6NkCyEUTcQWT_ldPPi3UoStEifQlL"
 
-        self.forms = "forms"
         self.exel_template = exel_template
 
         self.parse_to_yaml()
@@ -141,13 +139,25 @@ class Parser():
         #else:
             audio_file= open(speech_path, "rb")
             result = self.model.audio.transcriptions.create(
-            model="whisper-1", 
-            file=audio_file,
-            language="bg"
+                model="whisper-1", 
+                file=audio_file,
+                language="bg"
             )
             transcript = result.text
 
             return transcript
+
+    def get_xp_together(self, sid, tid):
+        df = self.forms_meta
+        #print(sid, type(sid), tid, type(tid))
+        result  = (df[df['teacher_id'] == str(tid)]
+                [df['student_id'] == str(sid)]
+                .sort_values('creation_date'))
+        #print(result)
+        if result.empty:
+            return None
+        else:
+            return result['xp_together'].tolist()[-1]
 
     def dict_to_wb(self, wb_template, inputs):
         workbook = openpyxl.load_workbook(wb_template)
@@ -183,62 +193,12 @@ class Parser():
         
         return self.dict_to_wb(template, inputs)
     
-    def karta_to_drive(self, file_path):
-        """Upload card functional grade to Google Drive."""
-
-        folder_cards = "1F2oiBQzZt1ko7DhaVIeO4VR-5RrJDNlk"
-        try:
-            with build("drive", "v3", credentials=credentials) as service:            
-                file_metadata = {'name': os.path.basename(file_path), "parents": [folder_cards]}
-                media = MediaFileUpload(file_path, resumable=True)
-                
-                file = service.files().create(
-                    body=file_metadata, 
-                    media_body=media, 
-                    fields='id'
-                ).execute()
-                
-                return file.get('id')
-        except Exception as e:
-            st.error(f"Error uploading file: {e}")
-            return None
-        
-    def add_student_to_db(self, student, teacher_id, student_id):
-        student['date of entry'] = datetime.today().strftime("%d.%m.%Y")
-        student['id teacher'] = teacher_id
-        student['id student'] = student_id
-
-        self.students.loc[len(self.students)] = student
-        set_with_dataframe(self.sheeet_student, self.students)
-
-
-        
-    
-    def save_scenario(self, dict, file_name):
-        name = file_name
-
-        with open(name, 'w') as json_file:
-            json.dump(dict, json_file, indent=4)
-        
-        # Prepare file metadata
-        folder_id = "1HeAv4-zn--7IUxZZY4MgMb2lb_YdFCsD"
-        file_metadata = {'name': "scenario.json", 'parents': [folder_id]}
-        
-        # Upload file to Google Drive
-        with build("drive", "v3", credentials=credentials) as service:
-            media = MediaFileUpload(name, resumable=True)
-            file = service.files().create(
-                body=file_metadata, 
-                media_body=media, 
-                fields='id'
-            ).execute()
-        
-        os.remove(file_name)
-        print(f'File ID: {file.get("id")}')
-        return file.get('id')
-
+    # ================================================================================
+    #       Google Drive Fuctionalities - General
+    # ================================================================================
     def create_google_drive_link(self, file_id):
-        return f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
+        link = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
+        return link
 
     def extract_file_id(self, url):
         # Regular expression for Google Drive file ID
@@ -249,34 +209,72 @@ class Parser():
         else:
             raise ValueError("Invalid Google Drive URL")
 
-    def get_filename(self, url):
-        with build("drive", "v3", credentials=credentials) as service:
-            file_id = self.extract_file_id(url)
-            print(file_id)
-
-            file_metadata = service.files().get(fileId=file_id, fields='name').execute()
-
-        return file_metadata['name']
-
-    def _get_unused_name(self, folder, name):
-            dir = os.listdir(folder)
-
-            if not name in dir:
-                return os.path.join(folder, name)
+    def upload_doc_drive(self, file_path, parent_folder):
+        # Upload the File at 'file_path' to the google drive folder with id: 'parent_folder'
+        try:
+            with build("drive", "v3", credentials=credentials) as service:            
+                file_metadata = {'name': os.path.basename(file_path), "parents": [parent_folder]}
+                media = MediaFileUpload(file_path, resumable=True)
+                
+                file = service.files().create(
+                    body=file_metadata, 
+                    media_body=media, 
+                    fields='id'
+                ).execute()
             
-            for i in range(1, len(dir) + 2):
-                file_name, extension = os.path.splitext(name)
-                path = file_name + f"({i})" + extension
-                if not path in dir:
-                    return os.path.join(folder, path)
+            return file.get('id')
+        except Exception as e:
+            st.error(f"Error uploading file: {e}")
+            return None
 
-    def add_form_to_db(self, form, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id):
+    def get_filename(self, url):
+        # Extract the file name from the url to the file in Drive
+        try:
+            with build("drive", "v3", credentials=credentials) as service:
+                file_id = self.extract_file_id(url)
+                # print(file_id)
+                file_metadata = service.files().get(fileId=file_id, fields='name').execute()
+
+            return file_metadata['name']
+        except ValueError:
+            return None
+ 
+    # ================================================================================
+    #       Google Drive Fuctionalities - Specific
+    # ================================================================================
+
+    def karta_to_drive(self, file_path):
+        """Upload card functional grade to Google Drive."""
+
+        folder_cards = "1F2oiBQzZt1ko7DhaVIeO4VR-5RrJDNlk"
+        file_id = self.upload_doc_drive(file_path, folder_cards)
+        
+        return file_id     
+    
+    def save_scenario(self, dict, file_name):
+        with open(file_name, 'w') as json_file:
+            json.dump(dict, json_file, indent=4, ensure_ascii=False)
+        
+        # Prepare file metadata
+        folder_scenario = "1HeAv4-zn--7IUxZZY4MgMb2lb_YdFCsD"
+        file_id = self.upload_doc_drive(file_name, folder_scenario)
+
+        os.remove(file_name)
+        return file_id
+
+    def add_student_to_db(self, student, teacher_id, student_id):
+        student['date of entry'] = datetime.today().strftime("%d.%m.%Y")
+        student['id teacher'] = teacher_id
+        student['id student'] = str(student_id)
+
+        self.students.loc[len(self.students)] = student
+        last_row = self.students.iloc[-1].tolist()
+        self.sheeet_student.append_row(last_row)
+
+    def add_form_to_db(self, form, t_id, audio_sit, audio_act, audio_eff, script_sit, script_act, script_eff,  s_id, xp_together):
         # row = form_id,from_path,date,time,audio_sit,audio_action,audio_effect,transcript_sit,transcript_action,transcript_effect,teacher_id,student_id
-       
-
         time = datetime.now()
-        print(time)
-        form_id = hash(str(t_id) + str(s_id) + str(time)) 
+
         cr_date, cr_time = time.strftime("%d-%m-%Y"), time.strftime("%H:%M")
 
         if script_sit == "":
@@ -286,28 +284,45 @@ class Parser():
         if script_eff == "":
             script_eff = "empty"
 
-        if audio_sit == "":
-            audio_sit = "None"
-        if audio_act == "":
-            audio_act = "None"
-        if audio_eff == "":
-            audio_eff = "None"
+        recording_folder = "17sNd1INEALhXbEiA5jklEu68SoZverUm"
 
-        drive_form_id = self.save_scenario(form, f"scenario-{cr_date}-sid:{s_id}.json")
+        if audio_sit != "None" and os.path.isfile(audio_sit):
+            audio_sit_id = self.upload_doc_drive(audio_sit, recording_folder)
+            os.remove(audio_sit)
+            audio_sit = self.create_google_drive_link(audio_sit_id)
+
+        if audio_act != "None" and os.path.isfile(audio_act):
+            audio_act_id = self.upload_doc_drive(audio_act, recording_folder)
+            os.remove(audio_act)
+            audio_act = self.create_google_drive_link(audio_act_id)
+            
+        if audio_eff != "None" and os.path.isfile(audio_eff):
+            audio_eff_id = self.upload_doc_drive(audio_eff, recording_folder)
+            os.remove(audio_eff)
+            audio_eff = self.create_google_drive_link(audio_eff_id)
+           
+
+
+        drive_form_id = self.save_scenario(form, f"scenario.json")
+
         form['id'] = drive_form_id
 
-        new_row = [form_id, cr_date, cr_time,
+        
+
+        new_row = [str(self.create_google_drive_link(drive_form_id)), cr_date, cr_time,
                    audio_sit, audio_act, audio_eff,
                    script_sit, script_act, script_eff, 
-                   t_id, s_id]
+                   t_id, str(s_id), xp_together]
        
+        #for i in new_row:
+        #    print(type(i))
 
         db = self.forms_meta
 
-        if form_id not in db['form_id'].to_list():
-            db.loc[len(db)] = new_row
-            print("Updating the form meta database")
-            set_with_dataframe(self.sheet_meta, db)
+        db.loc[len(db)] = new_row
+        print("Updating the form meta database")
+        self.forms_meta = db
+        set_with_dataframe(self.sheet_meta, db)
 
         return bool(drive_form_id)
     
