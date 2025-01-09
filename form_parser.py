@@ -150,9 +150,9 @@ class Parser():
     def get_xp_together(self, sid, tid):
         df = self.forms_meta
         #print(sid, type(sid), tid, type(tid))
-        result  = (df[df['teacher_id'] == str(tid)]
+        result  = (df.loc[df['teacher_id'] == str(tid)]
                 [df['student_id'] == str(sid)]
-                .sort_values('creation_date'))
+                .sort_values('creation_date')) # TODO fix here the date sorting also
         #print(result)
         if result.empty:
             return None

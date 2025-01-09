@@ -51,10 +51,11 @@ def get_student_data(id):
     students= parser.students
     # print(students)
     students = students.loc[students['id student'] == str(id)]
-    students_sorted = students.sort_values('date of entry', ascending=False)
+    # students_sorted = students.sort_values('date of entry', ascending=False) TODO - change to sort by date in our format 
 
-    if not students_sorted.empty:
-        student = students_sorted.iloc[0]
+    if not students.empty:
+        student = students.iloc[-1]
+        # print(student['date of entry'])
 
         sp_dict = dict(zip(
             students.columns.tolist(),
@@ -97,6 +98,9 @@ def transcribe(audio, audio_path, keey):
 #       Defining State Variables
 # =====================================================================
 
+if "Complex needs" not in st.session_state:
+    st.session_state['Complex needs'] = ""
+
 if not "counter" in st.session_state:
     st.session_state['counter'] = 0
 
@@ -134,20 +138,29 @@ def reset_state_student():
     st.session_state['ra_gender'] = None
     st.session_state['ti_age'] =""
 
-    st.session_state['autism'] = False
-    st.session_state['dyslexia'] = False
-    st.session_state['ns1'] = False
-    st.session_state['ns2'] = False
-    st.session_state['ns3'] = False
-    st.session_state['ns4'] = False
-    st.session_state['ns5'] = False
-    st.session_state['ns6'] = False
-    st.session_state['ns7'] = False
-    st.session_state['ns8'] = False
-    st.session_state['ns9'] = False
-    st.session_state['ns10'] = False
-    st.session_state['ns11'] = False
-    st.session_state['ns12'] = False   
+    st.session_state['Autism Spectrum Disorder'] = False
+    st.session_state['Speech and language disorders'] = False
+    st.session_state['Dyslexia'] = False
+    st.session_state['Dyscalculia'] = False
+    st.session_state['Dyspraxia'] = False
+    st.session_state['Moderate to severe learning difficulties'] = False
+    st.session_state['ADHD'] = False
+    st.session_state['Attachement disorder'] = False 
+    st.session_state['Anxiety disorders'] = False
+    st.session_state['Hearing impairment'] = False
+    st.session_state['Visual impairment'] = False
+    st.session_state['Sensory processing disorder'] = False
+    st.session_state['Epilepsy'] = False
+
+    st.session_state['Physical disabilities'] = ""
+    st.session_state['Chronic health conditions'] = ""
+    st.session_state['Genetic conditions'] = ""
+    st.session_state['Complex needs'] = ""
+
+    st.session_state['has physical'] = st.session_state['Physical disabilities'] != ""
+    st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != ""
+    st.session_state['has genetic'] = st.session_state['Genetic conditions'] != ""
+    st.session_state['has complex'] = st.session_state['Complex needs'] != "" 
 
     st.session_state['ti_xp_together'] = ""    
 
@@ -250,20 +263,30 @@ if st.session_state['authentication_status']:
                 st.session_state['ra_gender'] = str(sp['gender'])
                 st.session_state['ti_age'] = str(sp['age'])
 
-                st.session_state['autism'] = bool(int(sp['autism']))
-                st.session_state['dyslexia'] = bool(int(sp['dyslexia']))
-                st.session_state['ns1'] = bool(int(sp['ns1']))
-                st.session_state['ns2'] = bool(int(sp['ns2']))
-                st.session_state['ns3'] = bool(int(sp['ns3'])) 
-                st.session_state['ns4'] = bool(int(sp['ns4'])) 
-                st.session_state['ns5'] = bool(int(sp['ns5'])) 
-                st.session_state['ns6'] = bool(int(sp['ns6'])) 
-                st.session_state['ns7'] = bool(int(sp['ns7'])) 
-                st.session_state['ns8'] = bool(int(sp['ns8']))
-                st.session_state['ns9'] = bool(int(sp['ns9']))  
-                st.session_state['ns10'] = bool(int(sp['ns10']))
-                st.session_state['ns11'] = bool(int(sp['ns11']))
-                st.session_state['ns12'] = bool(int(sp['ns12']))
+                # Session State Proxy's NEED to be names exactly as the columns of the dataframe/google-sheets
+                st.session_state['Autism Spectrum Disorder'] = bool(int(sp['Autism Spectrum Disorder']))
+                st.session_state['Speech and language disorders'] = bool(int(sp['Speech and language disorders']))
+                st.session_state['Dyslexia'] = bool(int(sp['Dyslexia']))
+                st.session_state['Dyscalculia'] = bool(int(sp['Dyscalculia']))
+                st.session_state['Dyspraxia'] = bool(int(sp['Dyspraxia'])) 
+                st.session_state['Moderate to severe learning difficulties'] = bool(int(sp['Moderate to severe learning difficulties'])) 
+                st.session_state['ADHD'] = bool(int(sp['ADHD'])) 
+                st.session_state['Attachement disorder'] = bool(int(sp['Attachement disorder'])) 
+                st.session_state['Anxiety disorders'] = bool(int(sp['Anxiety disorders'])) 
+                st.session_state['Hearing impairment'] = bool(int(sp['Hearing impairment']))
+                st.session_state['Visual impairment'] = bool(int(sp['Visual impairment']))  
+                st.session_state['Sensory processing disorder'] = bool(int(sp['Sensory processing disorder']))
+                st.session_state['Epilepsy'] = bool(int(sp['Epilepsy']))
+
+                st.session_state['Physical disabilities'] = str(sp['Physical disabilities'])
+                st.session_state['Chronic health conditions'] = str(sp['Chronic health conditions'])
+                st.session_state['Genetic conditions'] = str(sp['Genetic conditions'])
+                st.session_state['Complex needs'] = str(sp['Complex needs'])
+
+                st.session_state['has physical'] = st.session_state['Physical disabilities'] != ""
+                st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != ""
+                st.session_state['has genetic'] = st.session_state['Genetic conditions'] != ""
+                st.session_state['has complex'] = st.session_state['Complex needs'] != ""
 
                 if file == "link":
                     st.toast("The URL to the student card could not be loaded correctly", icon="❗")
@@ -274,11 +297,11 @@ if st.session_state['authentication_status']:
             else:
                 st.session_state['ti_xp_together'] = ""
 
-        st.markdown("##### Уникален анонимен номер на детето:")
+        st.markdown("##### Уникален анонимен номер на ученика:")
         st.selectbox("b", student_ids, key="sid", label_visibility="collapsed", index=None, on_change=update_student)
 
-        st.markdown("#### От колко години работите с това дете:")
-        st.text_input("От колко години работите с това дете:", key="ti_xp_together", label_visibility="collapsed")
+        st.markdown("#### От колко години работите с този ученик:")
+        st.text_input("От колко години работите с този ученик:", key="ti_xp_together", label_visibility="collapsed")
 
         # ====================================================================================================
         #           Situation and Reaction
@@ -339,7 +362,7 @@ if st.session_state['authentication_status']:
         st.markdown("\n\n")
         st.markdown("\n\n")
 
-        st.markdown("## Профил на детето")
+        st.markdown("## Профил на ученика")
 
         if st.session_state['sid'] is not None:
 
@@ -347,41 +370,83 @@ if st.session_state['authentication_status']:
             st.text_input("age", key='ti_age', label_visibility="collapsed")
 
             st.markdown("#### Пол")
-            #print(st.session_state['ra_gender'])
-            def gender_to_index(g):
-                if g == "мъж":
-                    return 0
-                elif g == "жена":
-                    return 1
-                else:
-                    return None
-            gender = st.radio("g", ("мъж", "жена"), horizontal=True, key='ra_gender', label_visibility="collapsed")
+            st.radio("g", ("мъж", "жена"), horizontal=True, key='ra_gender', label_visibility="collapsed")
 
-            st.markdown("#### Състояние на детето")
+            st.markdown("#### Състояние на ученика")
 
-            f1, f2, f3 = st.columns(3)
+            st.markdown("###### 1. Нужди от комуникация и взаимодействие")
 
-            with f1:
-                st.checkbox("Аутизъм (МКБ:ььь)", key="autism")
-                st.checkbox("нз2", key="ns2")
-                st.checkbox("нз5", key="ns5")
-                st.checkbox("нз8", key="ns8")
-                st.checkbox("нз11", key="ns11")
+            c1, c2 = st.columns(2)
 
-            with f2:
-                st.checkbox("Дислексия (МКБ:ььь)", key="dyslexia")
-                st.checkbox("нз3", key="ns3")
-                st.checkbox("нз6", key="ns6")
-                st.checkbox("нз9", key="ns9")
-                st.checkbox("нз12", key="ns12")
+            with c1:
+                st.checkbox("Разстройство от аутистичния спектър (МКБ F84)", key="Autism Spectrum Disorder")
+            with c2:
+                st.checkbox("Разстройства на речта и езика (МКБ F80)", key="Speech and language disorders")
 
-            with f3:
-                st.checkbox("нз1", key="ns1")
-                st.checkbox("нз4", key="ns4")
-                st.checkbox("нз7", key="ns7")
-                st.checkbox("нз10", key="ns10")
 
+            st.markdown("###### 2. Нужди от когниция и учене")
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.checkbox("Дислексия (МКБ F81.0)", key="Dyslexia")
+                st.checkbox("Диспраксия (МКБ F82)", key="Dyspraxia")
+            with c2:
+                st.checkbox("Дискалкулия (МКБ F81.2)", key="Dyscalculia")
+                st.checkbox("Умерени умствени изоставания (МКБ F70-F79)", key="Moderate to severe learning difficulties")
+
+
+            st.markdown("###### 3. Cоциално-емоционално и психично здраве")
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.checkbox("Хиперкинетично разстройство с нарушение на вниманието (МКБ F90)", key="ADHD")
+                st.checkbox("Панически разстройства (МКБ F41)", key="Anxiety disorders")
+                st.checkbox("Слепота и намалено зрение (МКБ H54)", key="Visual impairment")
+            with c2:
+                st.checkbox("Разстройство на реактивността на привързаността (МКБ F94.1)", key="Attachement disorder")
+                st.checkbox("Слухово увреждане (МКБ H90)", key="Hearing impairment")
+
+
+            st.markdown("###### 4. Сензорни и/или физически нужди")
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.checkbox("Разстройство на сензорната интеграция (МКБ F88.3)", key="Sensory processing disorder")
+            with c2:
+                if st.checkbox("Физически увреждания", key="has physical"):
+                    if "physical_value" not in st.session_state:
+                        st.session_state['physical_value'] = st.session_state['Physical disabilities']
+                    st.text_input("physical", key="physical_value", label_visibility="collapsed", placeholder="Опишете тук физическите увреждания")
+                    st.session_state['Physical disabilities'] = st.session_state['physical_value']
+
+            st.markdown("###### 5. Медицински или неврологични нужди")
+
+            c1, c2 = st.columns(2)
             
+
+            with c1:
+                st.checkbox("Епилепсия (МКБ G40)", key="Epilepsy")
+
+                if st.checkbox("Генетични състояния", key="has genetic"):
+                    if "gentic_value" not in st.session_state:
+                        st.session_state['gentic_value'] = st.session_state['Genetic conditions']
+                    st.text_input("genetic", key="gentic_value", label_visibility="collapsed", placeholder="Опишете тук генетичното състояние")
+                    st.session_state['Genetic conditions'] = st.session_state['gentic_value']
+            with c2:
+                if st.checkbox("Хронични здравословни състояния", key="has chronic"):
+                    if "chonic_value" not in st.session_state:
+                        st.session_state['chonic_value'] = st.session_state['Chronic health conditions']
+                    st.text_input("chronic", key="chonic_value",  label_visibility="collapsed", placeholder="Опишете тук състояниеto")
+                    st.session_state['Chronic health conditions'] = st.session_state['chonic_value']
+
+                if st.checkbox("Комплексни нужди", key="has complex"):
+                    if "complex_value" not in st.session_state:
+                        st.session_state['complex_value'] = st.session_state['Complex needs']
+                    st.text_input("needs", key="complex_value", label_visibility="collapsed", placeholder="Опишете тук нуждите")
+                    st.session_state['Complex needs'] = st.session_state['complex_value']
 
             if st.session_state['link_profile'] == "":
 
@@ -389,7 +454,7 @@ if st.session_state['authentication_status']:
                 st.markdown("#### За този ученик няма подадена карта функтионална - Подадете я тук (Опционално)")
                 karta = st.file_uploader("Functional Card (Optional)", ALLOWED_DOCUMENT_TYPES, label_visibility="collapsed")
             else:
-                st.markdown("#### Картата функционална оценка на детето:")
+                st.markdown("#### Картата функционална оценка на ученика:")
                 
                 #st.text_input("профилът", key="link_profile", label_visibility="collapsed")
                 t1, t2 = st.columns(2)
@@ -424,8 +489,7 @@ if st.session_state['authentication_status']:
                         return False
                     if grade == None:
                         return False
-                    if gender == None:
-                        return False
+
                     return True
 
                 if check_filled():
@@ -451,18 +515,53 @@ if st.session_state['authentication_status']:
                     if karta:
                         upload_card(karta)
 
+                    # Creating a new student Profile dict and updating it according to the form - Check for changes in the Student profile
                     old_student_pr, _ = get_student_data(st.session_state['sid'])
                     new_student_pr = old_student_pr.copy()
 
                     # print(old_student_pr, "\n\n", new_student_pr)
 
-                    profile_tags = ["autism", "dyslexia", "ns1", "ns2", "ns3", "ns4", "ns5", "ns6", "ns7", "ns8", "ns9", "ns10", "ns11", "ns12"]
+                    profile_tags = ["Autism Spectrum Disorder", "Speech and language disorders", "Dyslexia", "Dyscalculia", "Dyspraxia", "Moderate to severe learning difficulties",
+                                    "ADHD", "Attachement disorder", "Anxiety disorders", "Hearing impairment", "Visual impairment", "Sensory processing disorder", "Epilepsy"]
+                    profile_ti_fiels = ["Physical disabilities", "Chronic health conditions", "Genetic conditions", "Complex needs"]
 
                     for tag in profile_tags:
                         new_student_pr[tag] = str(int(st.session_state[tag]))
 
+                    if st.session_state['has physical']:
+                        if st.session_state['Physical disabilities'] == "":
+                            new_student_pr['Physical disabilities'] = "неуточнено"
+                        else:
+                            new_student_pr['Physical disabilities'] = st.session_state['Physical disabilities']
+                    else:
+                        new_student_pr['Physical disabilities'] = ""
+
+                    if st.session_state['has chronic']:
+                        if st.session_state['Chronic health conditions'] == "":
+                            new_student_pr['Chronic health conditions'] = "неуточнено"
+                        else:
+                            new_student_pr['Chronic health conditions'] = st.session_state['Chronic health conditions']
+                    else:
+                        new_student_pr['Chronic health conditions'] = ""
+
+                    if st.session_state['has genetic']:
+                        if st.session_state['Genetic conditions'] == "":
+                            new_student_pr['Genetic conditions'] = "неуточнено"
+                        else:
+                            new_student_pr['Genetic conditions'] = st.session_state['Genetic conditions']
+                    else:
+                        new_student_pr['Genetic conditions'] = ""
+
+                    if st.session_state['has complex']:
+                        if st.session_state['Complex needs'] == "":
+                            new_student_pr['Complex needs'] = "неуточнено"
+                        else:
+                            new_student_pr['Complex needs'] = st.session_state['Complex needs']
+                    else:
+                        new_student_pr['Complex needs'] = ""
+
                     new_student_pr['age'] = st.session_state['ti_age']
-                    new_student_pr['gender'] = gender
+                    new_student_pr['gender'] = st.session_state['ra_gender']
                     new_student_pr['link functional card'] = st.session_state['link_profile']
 
                     update = not (new_student_pr == old_student_pr)
@@ -486,11 +585,12 @@ if st.session_state['authentication_status']:
                     }
 
 
-                    new_pr = [label for label in profile_tags if bool(int(new_student_pr[label]))]                    
+                    new_pr = [label for label in profile_tags if bool(int(new_student_pr[label]))]     
+                    new_pr += [label + ": " + new_student_pr[label] for label in profile_ti_fiels if new_student_pr[label] != ""]               
 
                     student_pr = {
                         "age": st.session_state['ti_age'],
-                        "gender": gender,
+                        "gender": st.session_state['ra_gender'],
                         "profile": new_pr
                     }
 
