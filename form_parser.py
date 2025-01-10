@@ -179,6 +179,21 @@ class Parser():
         sheet[effect] = inputs['effect']
         sheet[rating] = inputs['grade']
 
+        sheet.protection = openpyxl.worksheet.protection.SheetProtection(
+            sheet=True,
+            formatCells=False,
+            formatColumns=False,
+            formatRows=False,
+            insertColumns=False,
+            insertRows=False,
+            insertHyperlinks=False,
+            deleteColumns=False,
+            deleteRows=False,
+            sort=False,
+            autoFilter=False,
+            pivotTables=False
+        )
+
         buffer = io.BytesIO()
         workbook.save(buffer)
         buffer.seek(0)

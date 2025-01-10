@@ -7,6 +7,7 @@ from yaml.loader import SafeLoader
 import os
 from audio_recorder_streamlit import audio_recorder
 import pandas as pd 
+import time
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -38,7 +39,7 @@ def get_teacher_data(username):
 
     if not teacher.empty:
         diff = now.year - int(teacher['Ресурсен учител от година'].values[0])
-        teacher_xp = f"{diff}-{diff + 1}"
+        teacher_xp = f"{diff} до {diff + 1}"
         teacher_id = teacher['Идентификационен номер на учител'].values[0]
     else:
         st.warning("Did not find the teacher in the database")
@@ -245,7 +246,7 @@ if st.session_state['authentication_status']:
 
     else:
         # From Here: Page of the actual form
-        st.markdown('# Бланка за описване на ситуация и реакция при работа с деца със СОП \n\n')
+        st.markdown('# Бланка за описване на ситуация и реакция при работа с ученици със СОП \n\n')
 
         def update_student():
             sid = st.session_state['sid']
@@ -300,10 +301,10 @@ if st.session_state['authentication_status']:
             else:
                 st.session_state['ti_xp_together'] = ""
 
-        st.markdown("##### Уникален анонимен номер на ученика:")
+        st.markdown("##### :red[*] Уникален анонимен номер на ученика:")
         st.selectbox("b", student_ids, key="sid", label_visibility="collapsed", index=None, on_change=update_student)
 
-        st.markdown("#### От колко години работите с този ученик:")
+        st.markdown("#### :red[*] От колко години работите с този ученик:")
         st.text_input("От колко години работите с този ученик:", key="ti_xp_together", label_visibility="collapsed")
 
         # ====================================================================================================
@@ -314,11 +315,11 @@ if st.session_state['authentication_status']:
         st.markdown("\n\n")
         st.markdown("## Ситуация и реакция" )
         st.markdown(" ")
-        st.markdown("##### Дата на :rainbow[случката]:")   
-        date = st.date_input("Дата на :rainbow[случката]:", format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
+        st.markdown("##### :red[*] Дата на :red[случката]:")   
+        date = st.date_input("Дата", format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
 
         st.markdown(" ")
-        st.markdown("#### **Опишете устно или писмено ситуацията, която се е случила:**")
+        st.markdown("#### :red[*] Опишете устно или писмено ситуацията, която се е случила:")
         st.markdown("(за гласов запис натиснете микрофона)")
         a1, a2 = st.columns([7, 1])
         with a2:
@@ -329,7 +330,7 @@ if st.session_state['authentication_status']:
             st.text_area("ситуацията", key="text_sit", placeholder="write here", height=257, label_visibility="collapsed")
         
         st.markdown("  ")
-        st.markdown("#### **Опишете устно или писмено Вашата реакция:**")
+        st.markdown("#### :red[*] Опишете устно или писмено Вашата реакция:")
         st.markdown("(за гласов запис натиснете микрофона)")
         b1, b2 = st.columns([7, 1])
         with b2:
@@ -348,7 +349,7 @@ if st.session_state['authentication_status']:
             st.text_area("Опишете ефекта от вашата реакция:", key="text_eff", height=257, label_visibility="collapsed")
 
 
-        st.markdown("#### Оценете ефекта от Вашата реакция:")
+        st.markdown("#### :red[*] Оценете ефекта от Вашата реакция:")
         grades=[1, 2, 3, 4, 5]
 
         def grade_to_label(g):
@@ -368,15 +369,15 @@ if st.session_state['authentication_status']:
 
         if st.session_state['sid'] is not None:
 
-            st.markdown("#### На колко години е ученикът?")
+            st.markdown("#### :red[*] На колко години е ученикът?")
             st.text_input("age", key='ti_age', label_visibility="collapsed")
 
-            st.markdown("#### Пол")
+            st.markdown("#### :red[*] Пол")
             st.radio("g", ("мъж", "жена"), horizontal=True, key='ra_gender', label_visibility="collapsed")
 
             st.markdown("#### Състояние на ученика")
 
-            st.markdown("###### 1. Нужди от комуникация и взаимодействие")
+            st.markdown("###### 1. Проблеми с комуникация и взаимодействие")
 
             c1, c2 = st.columns(2)
 
@@ -395,10 +396,10 @@ if st.session_state['authentication_status']:
                 st.checkbox("Диспраксия (МКБ F82)", key="Dyspraxia")
             with c2:
                 st.checkbox("Дискалкулия (МКБ F81.2)", key="Dyscalculia")
-                st.checkbox("Умерени умствени изоставания (МКБ F70-F79)", key="Moderate to severe learning difficulties")
+                st.checkbox("Умерени до тежки обучителни трудности (МКБ F79)", key="Moderate to severe learning difficulties")
 
 
-            st.markdown("###### 3. Cоциално-емоционално и психично здраве")
+            st.markdown("###### 3. Cоциално, емоционално и психично здраве")
 
             c1, c2 = st.columns(2)
 
@@ -416,7 +417,7 @@ if st.session_state['authentication_status']:
             c1, c2 = st.columns(2)
 
             with c1:
-                st.checkbox("Разстройство на сензорната интеграция (МКБ F88.3)", key="Sensory processing disorder")
+                st.checkbox("Разстройство на сензорната интеграция (МКБ F88)", key="Sensory processing disorder")
             with c2:
                 if st.checkbox("Физически увреждания", key="has physical"):
                     if "physical_value" not in st.session_state:
@@ -428,7 +429,6 @@ if st.session_state['authentication_status']:
 
             c1, c2 = st.columns(2)
             
-
             with c1:
                 st.checkbox("Епилепсия (МКБ G40)", key="Epilepsy")
 
@@ -453,7 +453,7 @@ if st.session_state['authentication_status']:
             if st.session_state['link_profile'] == "":
 
                 
-                st.markdown("#### За този ученик няма подадена карта функтионална - Подадете я тук (Опционално)")
+                st.markdown("#### За този ученик няма подадена карта функтионална оценка - Подадете я тук (Опционално)")
                 karta = st.file_uploader("Functional Card (Optional)", ALLOWED_DOCUMENT_TYPES, label_visibility="collapsed")
             else:
                 st.markdown("#### Картата функционална оценка на ученика:")
@@ -461,11 +461,11 @@ if st.session_state['authentication_status']:
                 #st.text_input("профилът", key="link_profile", label_visibility="collapsed")
                 t1, t2 = st.columns(2)
                 with t1: 
-                    st.markdown("###### Линк към картата в нашта система")
+                    st.markdown("###### Линк към картата")
                     st.link_button(st.session_state['profile_filename'], st.session_state['link_profile'], use_container_width=True)
                 with t2:
                     st.markdown("###### При нова карта тук (Опционално)")
-                    karta = st.file_uploader("При нова карта тук (Опционално)", label_visibility="collapsed")      
+                    karta = st.file_uploader("При нова карта подате тук (Опционално)", label_visibility="collapsed")      
 
             st.markdown(" ")
 
@@ -485,9 +485,9 @@ if st.session_state['authentication_status']:
                         return False
                     if st.session_state['text_act'] == "":
                         return False
-                    if st.session_state['text_eff'] == "":
-                        return False
                     if st.session_state['ti_age'] == "":
+                        return False
+                    if st.session_state['ra_gender'] is None:
                         return False
                     if grade == None:
                         return False
@@ -572,10 +572,12 @@ if st.session_state['authentication_status']:
                         st.toast("Updating the database of students with new row")
                         parser.add_student_to_db(new_student_pr, teacher_id, st.session_state['sid'])
 
+                    grade_text = grade_to_label(grade)
+
                     inputs_exel = {
                         "teacher_id": teacher_id,
                         "student_id": st.session_state['sid'],
-                        "date": date.strftime('%d-%m-Y %H:%M'),
+                        "date": date.strftime('%d-%m-%Y'),
                         "teacher_xp": teacher_xp,
                         "student_age": st.session_state['ti_age'],
                         "xp_with_child": st.session_state['ti_xp_together'],
@@ -583,7 +585,7 @@ if st.session_state['authentication_status']:
                         "situation": st.session_state['text_sit'],
                         "action": st.session_state['text_act'],
                         "effect": st.session_state['text_eff'],
-                        "grade": grade
+                        "grade": grade_text
                     }
 
 
@@ -598,6 +600,7 @@ if st.session_state['authentication_status']:
 
                     inputs_form = {
                         "student_profile": student_pr,
+                        "date": date.strftime('%d-%m-%Y'),
                         "situation": st.session_state['text_sit'],
                         "action": st.session_state['text_act'],
                         "effect": st.session_state['text_eff'],
@@ -607,8 +610,19 @@ if st.session_state['authentication_status']:
                     exel = parser.create_exel(inputs_exel)
                     st.session_state['exel'] = exel
 
-                    id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
+                    try:
+                        id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
                                             transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
+                    except Exception as e:
+                        st.error("Имаше Проблем при испращането на формуляра! Моля изчакаите докато се опитваме отново.")
+                        st.error(e)
+                        time.sleep(150)
+                        try:
+                            id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
+                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
+                        except Exception as e:
+                            st.error("При втори опит пак не стана. Моля заредете отново или се опитаите в по късен момент пак")
+                            st.error(e)
 
                     if id_drive and exel:
                         st.session_state['balloons'] = True
