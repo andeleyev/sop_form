@@ -10,9 +10,6 @@ from streamlit_authenticator import Hasher
 import yaml
 import re
 
-from gspread_dataframe import get_as_dataframe, set_with_dataframe
-# import gdown
-# from bs4 import BeautifulSoup
 import gspread
 from google.oauth2.service_account import Credentials
 import streamlit as st
@@ -64,6 +61,7 @@ class Parser():
         client =  gspread.authorize(credentials)
         self.client = client
         
+        self.meta_sheet_id = "1Rqw51AqqepG78FmrN1UqiWvwPS5ITpzSCA1Bx4WDmkU"
         self.sheet_meta = client.open_by_key("1Rqw51AqqepG78FmrN1UqiWvwPS5ITpzSCA1Bx4WDmkU").sheet1
         data_meta = self.sheet_meta.get_all_values()
         self.forms_meta = pd.DataFrame(data_meta[1:], columns=data_meta[0])
@@ -72,6 +70,7 @@ class Parser():
         data_teacher = self.sheet_teacher.get_all_values()
         self.teachers = pd.DataFrame(data_teacher[1:], columns=data_teacher[0])
         
+        self.sheet_id_students = "1BcsZPL-CKhOmBYWc96cuK594Zau1anQhdaBCQTUAsHU"
         self.sheeet_student = client.open_by_key("1BcsZPL-CKhOmBYWc96cuK594Zau1anQhdaBCQTUAsHU").sheet1
         data_student = self.sheeet_student.get_all_values()
         self.students = pd.DataFrame(data_student[1:], columns=data_student[0])
@@ -149,15 +148,19 @@ class Parser():
 
     def get_xp_together(self, sid, tid):
         df = self.forms_meta
+
         #print(sid, type(sid), tid, type(tid))
-        result  = (df.loc[df['teacher_id'] == str(tid)]
-                [df['student_id'] == str(sid)]
-                .sort_values('creation_date')) # TODO fix here the date sorting also
+        df = df.loc[(df['teacher_id'] == str(tid)) & (df['student_id'] == str(sid))].copy()
         #print(result)
-        if result.empty:
+        df['datetime'] = pd.to_datetime(df['creation_date'] + ' ' + df['creation_time'], format='%d-%m-%Y %H:%M')
+        df.replace('None', pd.NA, inplace=True)
+        df = df.sort_values('datetime', ascending=False)
+        
+        if df.empty:
             return None
         else:
-            return result['xp_together'].tolist()[-1]
+            result = df.iloc[0]
+            return str(result['xp_together'])
 
     def dict_to_wb(self, wb_template, inputs):
         workbook = openpyxl.load_workbook(wb_template)
@@ -196,6 +199,17 @@ class Parser():
     # ================================================================================
     #       Google Drive Fuctionalities - General
     # ================================================================================
+    def reload(self):
+        self.student_sheet = self.client.open_by_key(self.sheet_id_students).sheet1
+        data_student = self.sheeet_student.get_all_values()
+        self.students = pd.DataFrame(data_student[1:], columns=data_student[0])
+
+        self.sheet_meta = self.client.open_by_key(self.meta_sheet_id).sheet1
+        data_meta = self.sheet_meta.get_all_values()
+        self.forms_meta = pd.DataFrame(data_meta[1:], columns=data_meta[0])
+
+
+
     def create_google_drive_link(self, file_id):
         link = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
         return link
@@ -263,7 +277,7 @@ class Parser():
         return file_id
 
     def add_student_to_db(self, student, teacher_id, student_id):
-        student['date of entry'] = datetime.today().strftime("%d.%m.%Y")
+        student['date of entry'] = datetime.now().strftime('%d-%m-%Y %H:%M')
         student['id teacher'] = teacher_id
         student['id student'] = str(student_id)
 
@@ -317,12 +331,9 @@ class Parser():
         #for i in new_row:
         #    print(type(i))
 
-        db = self.forms_meta
 
-        db.loc[len(db)] = new_row
         print("Updating the form meta database")
-        self.forms_meta = db
-        set_with_dataframe(self.sheet_meta, db)
+        self.sheet_meta.append_row(new_row)
 
         return bool(drive_form_id)
     

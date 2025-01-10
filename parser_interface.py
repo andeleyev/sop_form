@@ -6,6 +6,7 @@ import yaml
 from yaml.loader import SafeLoader
 import os
 from audio_recorder_streamlit import audio_recorder
+import pandas as pd 
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
@@ -48,13 +49,16 @@ def get_teacher_data(username):
 # @st.cache_data
 def get_student_data(id):
     global parser
-    students= parser.students
+    students_all = parser.students
     # print(students)
-    students = students.loc[students['id student'] == str(id)]
-    # students_sorted = students.sort_values('date of entry', ascending=False) TODO - change to sort by date in our format 
+    students = students_all.loc[students_all['id student'] == str(id)].copy()
 
-    if not students.empty:
-        student = students.iloc[-1]
+    students['date of entry'] = pd.to_datetime(students['date of entry'], format='%d-%m-%Y %H:%M', errors='coerce')
+    students = students.dropna(subset=['date of entry'])
+    students_sorted = students.sort_values('date of entry', ascending=False)
+
+    if not students_sorted.empty:
+        student = students_sorted.iloc[0]
         # print(student['date of entry'])
 
         sp_dict = dict(zip(
@@ -232,8 +236,7 @@ if st.session_state['authentication_status']:
             reset = st.button("попълни нов формулар", type="primary", use_container_width=True)
 
         if reset:
-
-            
+            parser.reload()
             st.session_state['download'] = False
             reset_state_scenario()
             reset_state_student()
@@ -344,7 +347,6 @@ if st.session_state['authentication_status']:
         with c1:
             st.text_area("Опишете ефекта от вашата реакция:", key="text_eff", height=257, label_visibility="collapsed")
 
-        # print(st.session_state['text_eff']) TODO
 
         st.markdown("#### Оценете ефекта от Вашата реакция:")
         grades=[1, 2, 3, 4, 5]
@@ -567,13 +569,13 @@ if st.session_state['authentication_status']:
                     update = not (new_student_pr == old_student_pr)
 
                     if update:
-                        st.toast("Updating the database of student with new row")
+                        st.toast("Updating the database of students with new row")
                         parser.add_student_to_db(new_student_pr, teacher_id, st.session_state['sid'])
 
                     inputs_exel = {
                         "teacher_id": teacher_id,
                         "student_id": st.session_state['sid'],
-                        "date": date.strftime("%d-%m-%Y"),
+                        "date": date.strftime('%d-%m-Y %H:%M'),
                         "teacher_xp": teacher_xp,
                         "student_age": st.session_state['ti_age'],
                         "xp_with_child": st.session_state['ti_xp_together'],
