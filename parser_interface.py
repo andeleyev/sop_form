@@ -29,6 +29,21 @@ ALLOWED_DOCUMENT_TYPES = ['.docx', '.doc', '.odt', '.ott', '.rtf', '.pages', '.t
 
 student_ids = [999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014]
 
+instruct_sit = """- Какво се случи
+- Ученика какво направи
+- Какво доведе до тази ситуация
+...
+"""
+
+instruct_act = """- Вие и/или ваще колеги как подеиствахте
+... 
+"""
+
+instruct_eff = """- След ваще деиствия как се промени ситуацията
+- как реагира ученика
+...
+"""
+
 # @st.cache_data
 def get_teacher_data(username):
     global parser
@@ -314,7 +329,7 @@ if st.session_state['authentication_status']:
         st.markdown("\n\n")
         st.markdown("\n\n")
         st.markdown("## Ситуация и реакция" )
-        st.markdown(" ")
+        st.markdown("При попълване моля :red[не] използваите цялото вярно име на ученика")
         st.markdown("##### :red[*] Дата на :red[случката]:")   
         date = st.date_input("Дата", format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
 
@@ -327,7 +342,7 @@ if st.session_state['authentication_status']:
             transcript_sit, audio_sit_path = transcribe(audio_sit, f"situation_audio.mp3", "text_sit")
 
         with a1:
-            st.text_area("ситуацията", key="text_sit", placeholder="write here", height=257, label_visibility="collapsed")
+            st.text_area("ситуацията", key="text_sit", placeholder=instruct_sit, height=257, label_visibility="collapsed")
         
         st.markdown("  ")
         st.markdown("#### :red[*] Опишете устно или писмено Вашата реакция:")
@@ -337,7 +352,7 @@ if st.session_state['authentication_status']:
             audio_act = audio_recorder("", key=st.session_state['audi_act_key'], pause_threshold=30.)
             transcript_act, audio_act_path = transcribe(audio_act, f"action_audio.mp3", "text_act")
         with b1:
-            st.text_area("реакцията", key="text_act", height=257, label_visibility="collapsed")
+            st.text_area("реакцията", key="text_act", placeholder=instruct_act, height=257, label_visibility="collapsed")
 
         st.markdown("#### Опишете устно или писмено **ефекта** от Вашата реакция:")
         st.markdown("(за гласов запис натиснете микрофона)")
@@ -346,7 +361,7 @@ if st.session_state['authentication_status']:
             audio_eff = audio_recorder("", key=st.session_state['audi_eff_key'], pause_threshold=30.)
             transcript_eff, audio_eff_path = transcribe(audio_eff, f"effect_audio.mp3", "text_eff")
         with c1:
-            st.text_area("Опишете ефекта от вашата реакция:", key="text_eff", height=257, label_visibility="collapsed")
+            st.text_area("Опишете ефекта от вашата реакция:", placeholder=instruct_eff, key="text_eff", height=257, label_visibility="collapsed")
 
 
         st.markdown("#### :red[*] Оценете ефекта от Вашата реакция:")
@@ -595,7 +610,7 @@ if st.session_state['authentication_status']:
                     student_pr = {
                         "age": st.session_state['ti_age'],
                         "gender": st.session_state['ra_gender'],
-                        "profile": new_pr
+                        "diagnosis": new_pr
                     }
 
                     inputs_form = {

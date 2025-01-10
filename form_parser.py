@@ -5,6 +5,7 @@ import os
 import openai
 # import whisper
 from datetime import datetime
+import openpyxl.styles
 import pandas as pd
 from streamlit_authenticator import Hasher
 import yaml
@@ -173,7 +174,13 @@ class Parser():
         sheet[teacher_experience] = inputs['teacher_xp']
         sheet[student_age] = inputs['student_age']
         sheet[teacher_exp_with_student] = inputs['xp_with_child']
-        sheet[student_profile] = inputs['student_profile']
+        # Hyperlink fo the karta
+        if inputs['student_profile'] == "":
+            sheet[student_profile] = ""
+        else:
+            hyper = f'=HYPERLINK("{inputs['student_profile']}", "{"Линк Карта Функтионална оценка"}")'
+            sheet[student_profile] = hyper
+
         sheet[situation] = inputs['situation']
         sheet[action_taken] = inputs['action']
         sheet[effect] = inputs['effect']
