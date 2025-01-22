@@ -29,19 +29,23 @@ ALLOWED_DOCUMENT_TYPES = ['.docx', '.doc', '.odt', '.ott', '.rtf', '.pages', '.t
 
 student_ids = [999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014]
 
-instruct_sit = """- Какво се случи
-- Ученика какво направи
-- Какво доведе до тази ситуация
-...
+instruct_sit = """Насочващи въпроси:
+- Каква беше конкретната обстановка?
+- Кои бяха участниците в ситуацията?
+- Какво предизвика ситуацията?
+- Как реагира ученика със СОП?
 """
 
-instruct_act = """- Вие и/или ваще колеги как подеиствахте
-... 
+instruct_act = """Насочващи въпроси:
+- Каква беше Вашата реакция при възникването на ситуацията?
+- Какви действия предприехте за да справите със ситуацията?
+- Бяха ли предприети мерки за такива ситуации?
 """
 
-instruct_eff = """- След ваще деиствия как се промени ситуацията
-- как реагира ученика
-...
+instruct_eff = """Насочващи въпроси:
+- Как се е разрешила ситуацията и как реагира ученика?
+- Успяхте ли да овладеете ситуацията преди да ескалира?
+- Имаше ли неочаквани резултати или предизвикателства?
 """
 
 # @st.cache_data
@@ -53,8 +57,13 @@ def get_teacher_data(username):
     # print("Teacher: ", teacher)
 
     if not teacher.empty:
-        diff = now.year - int(teacher['Ресурсен учител от година'].values[0])
-        teacher_xp = f"{diff} до {diff + 1}"
+        teacher_since = teacher['Ресурсен учител от година'].values[0]
+        if teacher_since.isdigit():
+            diff = now.year - int(teacher_since)
+            teacher_xp = f"{diff} до {diff + 1}"
+        else:
+            teacher_xp = ""
+        
         teacher_id = teacher['Идентификационен номер на учител'].values[0]
     else:
         st.warning("Did not find the teacher in the database")
@@ -221,7 +230,7 @@ authenticator = stauth.Authenticate(
     auto_hash=False
 )         
 
-authenticator.login(fields={'Form name':'Login', 'Username':'вашето потребителско име', 'Password':'парола', 'Login':'Login', 'Captcha':'Captcha'})
+authenticator.login(fields={'Form name':'СОП Проект - Вход', 'Username':'Потребителско име:', 'Password':'Парола:', 'Login':'Влез'})
 
 if st.session_state['authentication_status']:
 
@@ -232,7 +241,7 @@ if st.session_state['authentication_status']:
         st.write(f'Добре дошли *{st.session_state['name']}* ')
         st.write(f"Вашият Идентификатор: {teacher_id}")
     with k2:
-        authenticator.logout()
+        authenticator.logout("Изход")
 
 
 
@@ -261,7 +270,7 @@ if st.session_state['authentication_status']:
 
     else:
         # From Here: Page of the actual form
-        st.markdown('# Бланка за описване на ситуация и реакция при работа с ученици със СОП \n\n')
+        st.markdown('# СОП - Формуляр \n\n')
 
         def update_student():
             sid = st.session_state['sid']
@@ -329,12 +338,12 @@ if st.session_state['authentication_status']:
         st.markdown("\n\n")
         st.markdown("\n\n")
         st.markdown("## Ситуация и реакция" )
-        st.markdown("При попълване моля :red[не] използваите цялото вярно име на ученика")
+        st.markdown("При попълване моля, :red[не] използвайте истинското име на ученика")
         st.markdown("##### :red[*] Дата на :red[случката]:")   
         date = st.date_input("Дата", format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
 
         st.markdown(" ")
-        st.markdown("#### :red[*] Опишете устно или писмено ситуацията, която се е случила:")
+        st.markdown("#### :red[*] Опишете устно или писмено :blue[Ситуацията], която се е случила:")
         st.markdown("(за гласов запис натиснете микрофона)")
         a1, a2 = st.columns([7, 1])
         with a2:
@@ -345,7 +354,7 @@ if st.session_state['authentication_status']:
             st.text_area("ситуацията", key="text_sit", placeholder=instruct_sit, height=257, label_visibility="collapsed")
         
         st.markdown("  ")
-        st.markdown("#### :red[*] Опишете устно или писмено Вашата реакция:")
+        st.markdown("#### :red[*] Опишете устно или писмено Вашата :blue[Реакция]:")
         st.markdown("(за гласов запис натиснете микрофона)")
         b1, b2 = st.columns([7, 1])
         with b2:
@@ -354,7 +363,7 @@ if st.session_state['authentication_status']:
         with b1:
             st.text_area("реакцията", key="text_act", placeholder=instruct_act, height=257, label_visibility="collapsed")
 
-        st.markdown("#### Опишете устно или писмено **ефекта** от Вашата реакция:")
+        st.markdown("#### Опишете устно или писмено :blue[Ефекта] от Вашата реакция:")
         st.markdown("(за гласов запис натиснете микрофона)")
         c1, c2 = st.columns([7, 1])
         with c2:
@@ -650,7 +659,7 @@ if st.session_state['authentication_status']:
             
         
 elif st.session_state['authentication_status'] is False:
-    st.error('Username/password is incorrect')
+    st.error('Потребителското име/паролата е неправилно')
 
 elif st.session_state['authentication_status'] is None:
-    st.warning('Please enter your username and password')
+    st.warning('Моля, въведете вашето потребителско име и парола')
