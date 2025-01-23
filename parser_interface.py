@@ -27,7 +27,7 @@ parser = initialize(api)
 
 ALLOWED_DOCUMENT_TYPES = ['.docx', '.doc', '.odt', '.ott', '.rtf', '.pages', '.txt', '.pdf', '.sxw', '.wpd']
 
-student_ids = [999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014]
+student_ids = [999, 1000, 1001, 1002, 1003, 1011]
 
 instruct_sit = """Насочващи въпроси:
 - Каква беше конкретната обстановка?
@@ -234,7 +234,7 @@ authenticator.login(fields={'Form name':'СОП Проект - Вход', 'Usern
 
 if st.session_state['authentication_status']:
 
-    k1, k2 = st.columns([3, 1])
+    k1, k2 = st.columns([6, 1])
     with k1:
         username = st.session_state['username']
         teacher_id, teacher_xp = get_teacher_data(username)  

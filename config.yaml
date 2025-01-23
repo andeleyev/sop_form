@@ -1,0 +1,42 @@
+cookie:
+  expiry_days: 5
+  key: jncjdjnjddedesaasd
+  name: sop_form_cookie
+credentials:
+  usernames:
+    dimitar.i:
+      email: mail_dummy@gmail.com
+      first_name: "\u0414\u0438\u043C\u0438\u0442\u044A\u0440"
+      last_name: "\u0418\u0432\u0430\u043D\u043E\u0432"
+      logged_in: false
+      password: $2b$12$Ztt3kvQUR2Zl6j09k9ynyeUNt5P2cspSIak00eyxkhr064TmwhYhm
+    elena.p:
+      email: mail_dummy@gmail.com
+      first_name: "\u0415\u043B\u0435\u043D\u0430"
+      last_name: "\u041F\u0435\u0442\u0440\u043E\u0432\u0430"
+      logged_in: false
+      password: $2b$12$XzYFzqYa6MNd9ba9W3Hjaefyz0O8GGCPhbyPwHz2zHcIOTHQxORj2
+    zvezdelina.a:
+      email: zatanasova2022@gmail.com
+      first_name: "\u0417\u0432\u0435\u0437\u0434\u0435\u043B\u0438\u043D\u0430"
+      last_name: "\u0410\u0442\u0430\u043D\u0430\u0441\u043E\u0432\u0430"
+      logged_in: false
+      password: $2b$12$Eeh7QTKDi17zZYkMFk0tPe2XFMjA6x4mNGHIn6ArSfGgkK4K6q7kG
+    test01:
+      email: ''
+      first_name: Test
+      last_name: '1'
+      logged_in: false
+      password: $2b$12$LtgK1WivzylTdwHPYsEGOuEZm7TaZqI.tHbFl7YylRNqJNR4RAuFy
+    test02:
+      email: ''
+      first_name: Test
+      last_name: '2'
+      logged_in: false
+      password: $2b$12$sDgfZDKs//n1Tsa/fmoMauiLG4u2ZN4uuor/jalqcpKsTBMNiQ7rq
+    test03:
+      email: ''
+      first_name: Test
+      last_name: '3'
+      logged_in: false
+      password: $2b$12$0yM8vtjYxQPh.4WKpGVPuO/JqwpkSYmiAupy/g0xsYPkXbf6FrgJ.
