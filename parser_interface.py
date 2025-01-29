@@ -11,19 +11,20 @@ import time
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
 
-api = st.secrets["general"]["api_key"]
-
+openai_key = st.secrets["API_keys"]["openai"]
+speechmatics = st.secrets['API_keys']['speechmatics']
 
 now = datetime.datetime.now()
 today = now.strftime("%d-%m-%Y")
 
 @st.cache_resource
-def initialize(key):
-    os.environ["OPENAI_API_KEY"] = key
+def initialize(api_key):
+    os.environ["OPENAI_API_KEY"] = api_key
+    # os.environ['SPECHMATICS_KEY'] = spechmatics
     parser = form_parser.Parser()
     return parser
 
-parser = initialize(api)
+parser = initialize(openai_key)
 
 ALLOWED_DOCUMENT_TYPES = ['.docx', '.doc', '.odt', '.ott', '.rtf', '.pages', '.txt', '.pdf', '.sxw', '.wpd']
 
@@ -477,7 +478,7 @@ if st.session_state['authentication_status']:
             if st.session_state['link_profile'] == "":
 
                 
-                st.markdown("#### За този ученик няма подадена карта функтионална оценка - Подадете я тук (Опционално)")
+                st.markdown("#### За този ученик няма подадена карта функционална оценка - Подадете я тук (По избор)")
                 karta = st.file_uploader("Functional Card (Optional)", ALLOWED_DOCUMENT_TYPES, label_visibility="collapsed")
             else:
                 st.markdown("#### Картата функционална оценка на ученика:")

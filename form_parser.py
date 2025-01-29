@@ -3,6 +3,8 @@ import json
 import io
 import os
 import openai
+#from speechmatics.models import ConnectionSettings, BatchTranscriptionConfig
+#from speechmatics.batch_client import BatchClient
 # import whisper
 from datetime import datetime
 import openpyxl.styles
@@ -50,13 +52,14 @@ rating = 'B22'
 
 class Parser():
 
-    def __init__(self, logging = True, exel_template = "form.xlsx", transcriptor = "api"):
+    def __init__(self, logging = True, exel_template = "form.xlsx", transcriptor = "openai_api"):
 
-        if transcriptor == "api":
-            self.model = openai.OpenAI()
-        #elif transcriptor == "local":
+        if transcriptor == "openai_api":
+            self.speech_client = openai.OpenAI()
+        #elif transcriptor == "whisper":
         #    self.model = whisper.load_model("small", in_memory = True )
 
+        # Can be openai_api, whisper or speechmatics
         self.transcriptor = transcriptor
 
         client =  gspread.authorize(credentials)
@@ -136,9 +139,10 @@ class Parser():
         #if self.transcriptor == "local":
         #    result = self.model.transcribe(speech_path, language="bg")
         #    transcript = result["text"]
-        #else:
+        #elif
+        #if self.transcriptor == "openai_api":
             audio_file= open(speech_path, "rb")
-            result = self.model.audio.transcriptions.create(
+            result = self.speech_client.audio.transcriptions.create(
                 model="whisper-1", 
                 file=audio_file,
                 language="bg"
@@ -146,6 +150,8 @@ class Parser():
             transcript = result.text
 
             return transcript
+        #elif self.transcriptor == "speechmatics":
+        #    pass
 
     def get_xp_together(self, sid, tid):
         df = self.forms_meta
