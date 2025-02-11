@@ -10,9 +10,8 @@ import pandas as pd
 import time
 
 st.set_page_config(page_title="SOP Form Parser", page_icon="🗣️", layout="centered", initial_sidebar_state="auto", menu_items=None)
-
 openai_key = st.secrets["API_keys"]["openai"]
-speechmatics = st.secrets['API_keys']['speechmatics']
+# speechmatics = st.secrets['API_keys']['speechmatics']
 
 now = datetime.datetime.now()
 today = now.strftime("%d-%m-%Y")
@@ -282,7 +281,8 @@ if st.session_state['authentication_status']:
             sp, file = get_student_data(sid)
 
             if not bool(sp):
-                st.toast("first form for this student")
+                #st.toast("first form for this student")
+                st.toast("Първоначално попълване за този ученик")
                 reset_state_student()
             else:
                 print("Loading Student: ", sp['id student'])
@@ -317,8 +317,8 @@ if st.session_state['authentication_status']:
                 st.session_state['has genetic'] = st.session_state['Genetic conditions'] != ""
                 st.session_state['has complex'] = st.session_state['Complex needs'] != ""
 
-                if file == "link":
-                    st.toast("The URL to the student card could not be loaded correctly", icon="❗")
+                #if file == "link":
+                #    st.toast("The URL to the student card could not be loaded correctly", icon="❗")
 
             xp = parser.get_xp_together(sid, teacher_id)
             if xp is not None:
@@ -345,7 +345,7 @@ if st.session_state['authentication_status']:
 
         st.markdown(" ")
         st.markdown("#### :red[*] Опишете устно или писмено :blue[Ситуацията], която се е случила:")
-        st.markdown("(за гласов запис натиснете микрофона)")
+        st.markdown("За гласов запис натиснете микрофона. Моля, :red[НЕ] използвайте истински имена.")
         a1, a2 = st.columns([7, 1])
         with a2:
             audio_sit = audio_recorder("", key=st.session_state['audi_sit_key'], pause_threshold=30.)
@@ -356,7 +356,7 @@ if st.session_state['authentication_status']:
         
         st.markdown("  ")
         st.markdown("#### :red[*] Опишете устно или писмено Вашата :blue[Реакция]:")
-        st.markdown("(за гласов запис натиснете микрофона)")
+        st.markdown("За гласов запис натиснете микрофона. Моля, :red[НЕ] използвайте истински имена.")
         b1, b2 = st.columns([7, 1])
         with b2:
             audio_act = audio_recorder("", key=st.session_state['audi_act_key'], pause_threshold=30.)
@@ -365,7 +365,7 @@ if st.session_state['authentication_status']:
             st.text_area("реакцията", key="text_act", placeholder=instruct_act, height=257, label_visibility="collapsed")
 
         st.markdown("#### Опишете устно или писмено :blue[Ефекта] от Вашата реакция:")
-        st.markdown("(за гласов запис натиснете микрофона)")
+        st.markdown("За гласов запис натиснете микрофона. Моля, :red[НЕ] използвайте истински имена.")
         c1, c2 = st.columns([7, 1])
         with c2:
             audio_eff = audio_recorder("", key=st.session_state['audi_eff_key'], pause_threshold=30.)
@@ -531,7 +531,7 @@ if st.session_state['authentication_status']:
                         file_id = parser.karta_to_drive(card.name)
                         
                         if file_id:
-                            st.toast('File uploaded successfully!')
+                            st.toast('Качването на файла е успешно')
                             link = parser.create_google_drive_link(file_id)
                             st.session_state['link_profile'] = link
                             st.session_state['profile_filename'] = parser.get_filename(link)
@@ -594,7 +594,7 @@ if st.session_state['authentication_status']:
                     update = not (new_student_pr == old_student_pr)
 
                     if update:
-                        st.toast("Updating the database of students with new row")
+                        st.toast("запазва се профила на ученика")
                         parser.add_student_to_db(new_student_pr, teacher_id, st.session_state['sid'])
 
                     grade_text = grade_to_label(grade)
@@ -661,6 +661,10 @@ if st.session_state['authentication_status']:
         
 elif st.session_state['authentication_status'] is False:
     st.error('Потребителското име/паролата е неправилно')
+    
 
 elif st.session_state['authentication_status'] is None:
     st.warning('Моля, въведете вашето потребителско име и парола')
+    
+st.divider()
+st.caption("Разработено само за образователни цели. Не се използват дествителни лица и случаи.")

@@ -10,3 +10,4 @@ situation_audio.mp3
 action_audio.mp3
 scenario.json
 test_speechmatics.py
+pwd_gen.py
