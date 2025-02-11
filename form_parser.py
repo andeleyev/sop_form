@@ -110,7 +110,7 @@ class Parser():
                 "logged_in": False,
                 "password": pwd,
             }
-            print(row["username"],":",pwd, sep="")
+            # print(row["username"],":",pwd, sep="")
 
         # Create the YAML structure
         config = {

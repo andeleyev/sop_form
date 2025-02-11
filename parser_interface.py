@@ -172,7 +172,7 @@ def reset_state_student():
     st.session_state['Dyslexia'] = False
     st.session_state['Dyscalculia'] = False
     st.session_state['Dyspraxia'] = False
-    st.session_state['Moderate to severe learning difficulties'] = False
+    st.session_state['Mental retardation'] = None
     st.session_state['ADHD'] = False
     st.session_state['Attachement disorder'] = False 
     st.session_state['Anxiety disorders'] = False
@@ -186,10 +186,12 @@ def reset_state_student():
     st.session_state['Genetic conditions'] = ""
     st.session_state['Complex needs'] = ""
 
-    st.session_state['has physical'] = st.session_state['Physical disabilities'] != ""
-    st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != ""
-    st.session_state['has genetic'] = st.session_state['Genetic conditions'] != ""
-    st.session_state['has complex'] = st.session_state['Complex needs'] != "" 
+    st.session_state['has_mental'] = st.session_state['Mental retardation'] != None
+
+    st.session_state['has physical'] = st.session_state['Physical disabilities'] != "" and st.session_state['Physical disabilities'] != " "
+    st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != "" and st.session_state['Chronic health conditions'] != " "
+    st.session_state['has genetic'] = st.session_state['Genetic conditions'] != "" and st.session_state['Genetic conditions'] != " "
+    st.session_state['has complex'] = st.session_state['Complex needs'] != "" and st.session_state['Complex needs'] != " "
 
     st.session_state['ti_xp_together'] = ""    
 
@@ -258,7 +260,7 @@ if st.session_state['authentication_status']:
         with d1:
             downloaded = st.download_button("изтегляне на попълнения формуляр", type="primary", use_container_width=True, data=st.session_state['exel'], file_name="filled_form.xlsx")
         with d2:
-            reset = st.button("попълни нов формулар", type="primary", use_container_width=True)
+            reset = st.button("попълни нов формуляр", type="primary", use_container_width=True)
 
         if reset:
             parser.reload()
@@ -298,7 +300,6 @@ if st.session_state['authentication_status']:
                 st.session_state['Dyslexia'] = bool(int(sp['Dyslexia']))
                 st.session_state['Dyscalculia'] = bool(int(sp['Dyscalculia']))
                 st.session_state['Dyspraxia'] = bool(int(sp['Dyspraxia'])) 
-                st.session_state['Moderate to severe learning difficulties'] = bool(int(sp['Moderate to severe learning difficulties'])) 
                 st.session_state['ADHD'] = bool(int(sp['ADHD'])) 
                 st.session_state['Attachement disorder'] = bool(int(sp['Attachement disorder'])) 
                 st.session_state['Anxiety disorders'] = bool(int(sp['Anxiety disorders'])) 
@@ -307,15 +308,21 @@ if st.session_state['authentication_status']:
                 st.session_state['Sensory processing disorder'] = bool(int(sp['Sensory processing disorder']))
                 st.session_state['Epilepsy'] = bool(int(sp['Epilepsy']))
 
+                st.session_state['Mental retardation'] = str(sp['Mental retardation'])
+                if st.session_state['Mental retardation'] == "" or st.session_state['Mental retardation'] == " ":
+                    st.session_state['Mental retardation'] = None
+
                 st.session_state['Physical disabilities'] = str(sp['Physical disabilities'])
                 st.session_state['Chronic health conditions'] = str(sp['Chronic health conditions'])
                 st.session_state['Genetic conditions'] = str(sp['Genetic conditions'])
                 st.session_state['Complex needs'] = str(sp['Complex needs'])
 
-                st.session_state['has physical'] = st.session_state['Physical disabilities'] != ""
-                st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != ""
-                st.session_state['has genetic'] = st.session_state['Genetic conditions'] != ""
-                st.session_state['has complex'] = st.session_state['Complex needs'] != ""
+                
+                st.session_state['has_mental'] = st.session_state['Mental retardation'] != None
+                st.session_state['has physical'] = st.session_state['Physical disabilities'] != "" and st.session_state['Physical disabilities'] != " "
+                st.session_state['has chronic'] = st.session_state['Chronic health conditions'] != "" and st.session_state['Chronic health conditions'] != " "
+                st.session_state['has genetic'] = st.session_state['Genetic conditions'] != "" and st.session_state['Genetic conditions'] != " "
+                st.session_state['has complex'] = st.session_state['Complex needs'] != "" and st.session_state['Complex needs'] != " "
 
                 #if file == "link":
                 #    st.toast("The URL to the student card could not be loaded correctly", icon="❗")
@@ -419,10 +426,13 @@ if st.session_state['authentication_status']:
             with c1:
                 st.checkbox("Дислексия (МКБ F81.0)", key="Dyslexia")
                 st.checkbox("Диспраксия (МКБ F82)", key="Dyspraxia")
+
             with c2:
                 st.checkbox("Дискалкулия (МКБ F81.2)", key="Dyscalculia")
-                st.checkbox("Умерени до тежки обучителни трудности (МКБ F79)", key="Moderate to severe learning difficulties")
-
+                # st.checkbox("Умерени до тежки обучителни трудности (МКБ F79)", key="Moderate to severe learning difficulties")
+                if st.checkbox("Умствена изостаналост (MKB F70-F73)", key='has_mental'):
+                    retardation_opt = ["Лека умствена изостаналост F70", "Умерена умствена изостаналост F71", "Тежка умствена изостаналост F72", "Дълбока умствена изостаналост F73", "Умствена изостаналост, неуточнена F79"]
+                    st.selectbox("Тежест:", retardation_opt, key="Mental retardation")
 
             st.markdown("###### 3. Cоциално, емоционално и психично здраве")
 
@@ -479,7 +489,7 @@ if st.session_state['authentication_status']:
 
                 
                 st.markdown("#### За този ученик няма подадена карта функционална оценка - Подадете я тук (По избор)")
-                karta = st.file_uploader("Functional Card (Optional)", ALLOWED_DOCUMENT_TYPES, label_visibility="collapsed")
+                karta = st.file_uploader("Ако се качва карта функционална оценка, тя не трябва да съдържа идентифицираща лицето информация.", ALLOWED_DOCUMENT_TYPES)
             else:
                 st.markdown("#### Картата функционална оценка на ученика:")
                 
@@ -489,8 +499,8 @@ if st.session_state['authentication_status']:
                     st.markdown("###### Линк към картата")
                     st.link_button(st.session_state['profile_filename'], st.session_state['link_profile'], use_container_width=True)
                 with t2:
-                    st.markdown("###### При нова карта тук (Опционално)")
-                    karta = st.file_uploader("При нова карта подате тук (Опционално)", label_visibility="collapsed")      
+                    st.markdown("###### При нова карта тук (По избор)")
+                    karta = st.file_uploader("При нова карта подате тук (По избор)", label_visibility="collapsed")      
 
             st.markdown(" ")
 
@@ -548,12 +558,21 @@ if st.session_state['authentication_status']:
 
                     # print(old_student_pr, "\n\n", new_student_pr)
 
-                    profile_tags = ["Autism Spectrum Disorder", "Speech and language disorders", "Dyslexia", "Dyscalculia", "Dyspraxia", "Moderate to severe learning difficulties",
+                    profile_tags = ["Autism Spectrum Disorder", "Speech and language disorders", "Dyslexia", "Dyscalculia", "Dyspraxia",
                                     "ADHD", "Attachement disorder", "Anxiety disorders", "Hearing impairment", "Visual impairment", "Sensory processing disorder", "Epilepsy"]
+                    profile_dropbox_field = "Mental retardation"
                     profile_ti_fiels = ["Physical disabilities", "Chronic health conditions", "Genetic conditions", "Complex needs"]
 
                     for tag in profile_tags:
                         new_student_pr[tag] = str(int(st.session_state[tag]))
+
+                    if st.session_state['has_mental']:
+                        if not st.session_state['Mental retardation'] is None:
+                            new_student_pr['Mental retardation'] = st.session_state['Mental retardation']
+                        else:
+                            new_student_pr['Mental retardation'] = "Умствена изостаналост, неуточнена F79"
+                    else:
+                        new_student_pr['Mental retardation'] = ""
 
                     if st.session_state['has physical']:
                         if st.session_state['Physical disabilities'] == "":
