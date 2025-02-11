@@ -339,7 +339,7 @@ if st.session_state['authentication_status']:
         st.markdown("\n\n")
         st.markdown("\n\n")
         st.markdown("## Ситуация и реакция" )
-        st.markdown("При попълване моля, :red[не] използвайте истинското име на ученика")
+        # st.markdown("При попълване моля, :red[не] използвайте истинското име на ученика")
         st.markdown("##### :red[*] Дата на :red[случката]:")   
         date = st.date_input("Дата", format="DD.MM.YYYY", label_visibility="collapsed") # remove default to make it today
 
@@ -412,7 +412,7 @@ if st.session_state['authentication_status']:
                 st.checkbox("Разстройства на речта и езика (МКБ F80)", key="Speech and language disorders")
 
 
-            st.markdown("###### 2. Нужди от когниция и учене")
+            st.markdown("###### 2. Когнитивни нарушения")
 
             c1, c2 = st.columns(2)
 
