@@ -9,58 +9,70 @@ credentials:
       first_name: "\u0414\u0438\u043C\u0438\u0442\u044A\u0440"
       last_name: "\u0418\u0432\u0430\u043D\u043E\u0432"
       logged_in: false
-      password: $2b$12$g1mlkPQxvbur2zvx2/4.cu6x0y6P/Xq9bm19GjQSMs2pApIGqzzau
+      password: $2b$12$oHUyTTkBrr408p/Quw2mxOiXqVtXxMmiWNTgEVMpo1Qa3k43pOO3K
     elena.p:
       email: mail_dummy@gmail.com
       first_name: "\u0415\u043B\u0435\u043D\u0430"
       last_name: "\u041F\u0435\u0442\u0440\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$Wo1DMKJjg.TYkRbNFfreiOZL7KOIh7J96fMWnVdy6ytvK54plrCfC
+      password: $2b$12$IGusMzsnP2yMPwWXX3iT/eZCzlkfMqc36yud2uRnib1E5zwn9ixDO
     test01:
       email: ''
       first_name: Test
       last_name: '1'
       logged_in: false
-      password: $2b$12$5rAkIKPk/o6jMT1m.5/H8e0MXJDDiuY4bntetPdY0X4nwIc0G2McK
+      password: $2b$12$rdBMiLQ4gqlkYK/qNmav6.RPwwMBJQnbBkgvNz8TuE.ZDfuhxXBUy
     test02:
       email: ''
       first_name: Test
       last_name: '2'
       logged_in: false
-      password: $2b$12$BFRvRWX7in3LZbFmKYU6sep9dtrjz2F0OYgKJfRGBiGDfT0M6.HUi
+      password: $2b$12$24UgG0bSktAsHbHyTx6XVOHaA9coCyqJ6rMifz80oeBHQFzYWc.S2
     test03:
       email: ''
       first_name: Test
       last_name: '3'
       logged_in: false
-      password: $2b$12$1L6RElZjUXQBEYxqaaFvJuWOl0tAzJT5fi6UVyCLeSOMqj9nZgSna
+      password: $2b$12$Q.L2p7DMut2q.qyvO98rp.b0Dpvq53Wuv2/vtsqSF0RqdZchJ0/sO
+    ? ''
+    : email: ''
+      first_name: "\u043D\u0435"
+      last_name: "\u0435"
+      logged_in: false
+      password: $2b$12$MqJAxm4eZdiz/zpydw9bMeU9LEMrwvpjazc3/XBb4LJQXpUZFIDoe
     zvezdelina.a:
       email: zatanasova2022@gmail.com
       first_name: "\u0417\u0432\u0435\u0437\u0434\u0435\u043B\u0438\u043D\u0430"
       last_name: "\u0410\u0442\u0430\u043D\u0430\u0441\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$Bxf.DfPjCqKlwmnCvoAxpuCYWbSNoGCsq7550VbOfO4SJ74Wka6sW
+      password: $2b$12$HWHlHn7L6tjwA3hL3jhyoOvho2rLmH4F/zgjGZ2gmOPygrzq0eQpG
     raya.s:
       email: rayastefanova915@gmail.com
       first_name: "\u0420\u0430\u044F"
       last_name: "\u0421\u0442\u0435\u0444\u0430\u043D\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$ugAwDqkvQnn2syrNSGV9je34ejojybiK.4s3O0soP5xqkojMnke/e
+      password: $2b$12$bMJJ/t4eKM/DR6kg2eidneBf5R.uIC0uCuSTQRHSzuL/JOuR0bbZi
     iliyana.p:
       email: iliyana.popova.psy@gmail.com
       first_name: "\u0418\u043B\u0438\u044F\u043D\u0430"
       last_name: "\u041F\u043E\u043F\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$vut.nqSKIt90djaCoQot.eF10MLslSswGw8IweKFcEEIGDvZjrNWi
+      password: $2b$12$bkHyktoWXk7rkyL1TvRBtOT1bnfm2IxHqoZLnpLSWZp5GfRfdRxCG
     elena.t:
       email: elytodorova.psy@gmail.com
       first_name: "\u0415\u043B\u0435\u043D\u0430"
       last_name: "\u0422\u043E\u0434\u043E\u0440\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$UDtiRL9YDKkJDWVTZaWU1eTAe6jLvEXdrgj0SFz2oxabYpZ8aA0yO
-    ? ''
-    : email: ''
-      first_name: ''
-      last_name: ' - '
+      password: $2b$12$o1zgpHkvqofzHYCWoqJbPO2KhK/Bs47jfDKqb4/ZD75BqDaAiVvhW
+    jasmina.d:
+      email: jas_d@abv.bg
+      first_name: "\u0416\u0430\u0441\u043C\u0438\u043D\u0430"
+      last_name: "\u0414\u0438\u043C\u0438\u0442\u0440\u043E\u0432\u0430"
       logged_in: false
-      password: $2b$12$FTs6ka97kbotYxatqUuXcu/EN4YBj6Vk3YEZj0aQC.NN9LQmIN9PC
+      password: $2b$12$g8z7BzOt5oTywDRiW5Xoj.WwEgIxWrLmaKxbWr1mMbWUbr/GOUoYW
+    svetla.a:
+      email: svsangelova@gmail.com
+      first_name: "\u0421\u0432\u0435\u0442\u043B\u0430\u043D\u0430"
+      last_name: "\u0410\u043D\u0433\u0435\u043B\u043E\u0432\u0430"
+      logged_in: false
+      password: $2b$12$YV7MyOKQr65FvB1RcQTryuwMjtgE3zddTlnovgcBdnCaoYd9tZW3.

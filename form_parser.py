@@ -89,7 +89,7 @@ class Parser():
     def parse_to_yaml(self):
         output_yaml = "config.yaml"
         if os.path.isfile(output_yaml):
-            return
+            os.remove(output_yaml)
         # Load the CSV into a Pandas DataFrame
         df = self.teachers
 
