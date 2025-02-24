@@ -4,7 +4,7 @@ import io
 import os
 import openai
 #from speechmatics.models import ConnectionSettings, BatchTranscriptionConfig
-#from speechmatics.batch_client import BatchClient
+#from speechmatics.batch_client import Batcheent
 # import whisper
 from datetime import datetime
 import openpyxl.styles
@@ -397,3 +397,4 @@ class Parser():
 
         return data, scenario
     '''
+    
