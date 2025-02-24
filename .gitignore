@@ -11,3 +11,5 @@ action_audio.mp3
 scenario.json
 test_speechmatics.py
 pwd_gen.py
+config.yaml
+.spyproject/
