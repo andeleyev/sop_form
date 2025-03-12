@@ -28,7 +28,7 @@ parser = initialize(openai_key)
 ALLOWED_DOCUMENT_TYPES = ['.docx', '.doc', '.odt', '.ott', '.rtf', '.pages', '.txt', '.pdf', '.sxw', '.wpd']
 
 # student_ids = [999, 1000, 1001, 1002, 1003, 1011]
-student_ids = range(2001, 2021)
+student_ids = range(2001, 2022)
 
 instruct_sit = """Насочващи въпроси:
 - Каква беше конкретната обстановка?
