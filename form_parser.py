@@ -18,6 +18,7 @@ from google.oauth2.service_account import Credentials
 import streamlit as st
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaIoBaseDownload
 
 
 
@@ -81,6 +82,7 @@ class Parser():
 
         self.logging = logging
         self.voice_loggs = "17sNd1INEALhXbEiA5jklEu68SoZverUm"
+        self.exel_folder = "1W9Ae2y8Lc1xHy8X3L6Ke6lkT9e_lZQUS"
 
         self.exel_template = exel_template
 
@@ -221,8 +223,8 @@ class Parser():
         else: 
             print("Invalid template - Nothing will be done")
             return
-        
-        return self.dict_to_wb(template, inputs)
+        exel = self.dict_to_wb(template, inputs)
+        return exel
     
     # ================================================================================
     #       Google Drive Fuctionalities - General
@@ -253,7 +255,7 @@ class Parser():
 
     def upload_doc_drive(self, file_path, parent_folder):
         # Upload the File at 'file_path' to the google drive folder with id: 'parent_folder'
-        try:
+        #try:
             with build("drive", "v3", credentials=credentials) as service:            
                 file_metadata = {'name': os.path.basename(file_path), "parents": [parent_folder]}
                 media = MediaFileUpload(file_path, resumable=True)
@@ -265,9 +267,23 @@ class Parser():
                 ).execute()
             
             return file.get('id')
-        except Exception as e:
-            st.error(f"Error uploading file: {e}")
-            return None
+        #except Exception as e:
+        #    st.error(f"Error uploading file: {e}")
+        #    return None
+        
+    def download_doc_from_drive(file_id, destination):
+        """Downloads a file from Google Drive."""
+        with build("drive", "v3", credentials=credentials) as service: 
+            request = service.files().get_media(fileId=file_id)
+            fh = io.FileIO(destination, 'wb')  # Open a local file to save content
+            downloader = MediaIoBaseDownload(fh, request)
+
+            done = False
+            while not done:
+                status, done = downloader.next_chunk()
+                print(f"Download {int(status.progress() * 100)}% complete.")
+
+            print(f"File downloaded to {destination}")
 
     def get_filename(self, url):
         # Extract the file name from the url to the file in Drive
@@ -293,6 +309,15 @@ class Parser():
         
         return file_id     
     
+    def upload_exel(self, exel, corresponding_json_id):
+        name = f"form_{corresponding_json_id}.xlsx"
+
+        with open(name, "wb") as f:
+            f.write(exel.getvalue())
+
+        self.upload_doc_drive(name, self.exel_folder)
+        os.remove(name)
+
     def save_scenario(self, dict, file_name):
         with open(file_name, 'w') as json_file:
             json.dump(dict, json_file, indent=4, ensure_ascii=False)
@@ -363,7 +388,7 @@ class Parser():
         print("Updating the form meta database")
         self.sheet_meta.append_row(new_row)
 
-        return bool(drive_form_id)
+        return drive_form_id
     
 
     '''

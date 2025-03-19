@@ -623,7 +623,7 @@ if st.session_state['authentication_status']:
                         "date": date.strftime('%d-%m-%Y'),
                         "teacher_xp": teacher_xp,
                         "student_age": st.session_state['ti_age'],
-                        "xp_with_child": "0", #st.session_state['ti_xp_together'],
+                        "xp_with_child": " ", #st.session_state['ti_xp_together'],
                         "student_profile": st.session_state['link_profile'],
                         "situation": st.session_state['text_sit'],
                         "action": st.session_state['text_act'],
@@ -655,19 +655,23 @@ if st.session_state['authentication_status']:
 
                     try:
                         id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
-                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], "0")# st.session_state['ti_xp_together'])
+                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], " ")# st.session_state['ti_xp_together'])
+                        
+                        parser.upload_exel(exel, id_drive)
                     except Exception as e:
                         st.error("Имаше Проблем при испращането на формуляра! Моля изчакаите докато се опитваме отново.")
                         st.error(e)
-                        time.sleep(150)
+                        time.sleep(5)
                         try:
                             id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
-                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], "0") # st.session_state['ti_xp_together'])
+                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], " ") # st.session_state['ti_xp_together'])
+                        
+                            parser.upload_exel(exel, id_drive)
                         except Exception as e:
                             st.error("При втори опит пак не стана. Моля заредете отново или се опитаите в по късен момент пак")
                             st.error(e)
 
-                    if id_drive and exel:
+                    if bool(id_drive) and exel:
                         st.session_state['balloons'] = True
                         st.session_state['download'] = True
                     st.rerun()
