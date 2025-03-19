@@ -659,14 +659,14 @@ if st.session_state['authentication_status']:
                         id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
                                             transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
                     except Exception as e:
-                        st.error("Имаше Проблем при испращането на формуляра! Моля изчакаите докато се опитваме отново.")
+                        st.error("Имаше проблем при изпращането на формуляра! Моля изчакайте докато се опитваме отново.")
                         st.error(e)
                         time.sleep(150)
                         try:
                             id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
                                             transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
                         except Exception as e:
-                            st.error("При втори опит пак не стана. Моля заредете отново или се опитаите в по късен момент пак")
+                            st.error("При втори опит пак не стана. Моля заредете отново или се опитайте в по-късен момент пак.")
                             st.error(e)
 
                     if id_drive and exel:
