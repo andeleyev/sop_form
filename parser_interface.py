@@ -194,8 +194,6 @@ def reset_state_student():
     st.session_state['has genetic'] = st.session_state['Genetic conditions'] != "" and st.session_state['Genetic conditions'] != " "
     st.session_state['has complex'] = st.session_state['Complex needs'] != "" and st.session_state['Complex needs'] != " "
 
-    st.session_state['ti_xp_together'] = ""    
-
 def reset_state_scenario():
     print("resetting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     st.session_state['counter'] += 1
@@ -328,17 +326,17 @@ if st.session_state['authentication_status']:
                 #if file == "link":
                 #    st.toast("The URL to the student card could not be loaded correctly", icon="❗")
 
-            xp = parser.get_xp_together(sid, teacher_id)
-            if xp is not None:
-                st.session_state['ti_xp_together'] = xp
-            else:
-                st.session_state['ti_xp_together'] = ""
+            #xp = parser.get_xp_together(sid, teacher_id)
+            #if xp is not None:
+            #    st.session_state['ti_xp_together'] = xp
+            #else:
+            #    st.session_state['ti_xp_together'] = ""
 
         st.markdown("##### :red[*] Уникален анонимен номер на ученика:")
         st.selectbox("b", student_ids, key="sid", label_visibility="collapsed", index=None, on_change=update_student)
 
-        st.markdown("#### :red[*] От колко години работите с този ученик:")
-        st.text_input("От колко години работите с този ученик:", key="ti_xp_together", label_visibility="collapsed")
+        # st.markdown("#### :red[*] От колко години работите с този ученик:")
+        # st.text_input("От колко години работите с този ученик:", key="ti_xp_together", label_visibility="collapsed")
 
         # ====================================================================================================
         #           Situation and Reaction
@@ -515,8 +513,8 @@ if st.session_state['authentication_status']:
                 def check_filled():
                     if st.session_state['sid'] is None:
                         return False
-                    if st.session_state['ti_xp_together'] == "":
-                        return False
+                    #if st.session_state['ti_xp_together'] == "":
+                    #    return False
                     if st.session_state['text_sit'] == "":
                         return False
                     if st.session_state['text_act'] == "":
@@ -625,7 +623,7 @@ if st.session_state['authentication_status']:
                         "date": date.strftime('%d-%m-%Y'),
                         "teacher_xp": teacher_xp,
                         "student_age": st.session_state['ti_age'],
-                        "xp_with_child": st.session_state['ti_xp_together'],
+                        "xp_with_child": "0", #st.session_state['ti_xp_together'],
                         "student_profile": st.session_state['link_profile'],
                         "situation": st.session_state['text_sit'],
                         "action": st.session_state['text_act'],
@@ -657,14 +655,14 @@ if st.session_state['authentication_status']:
 
                     try:
                         id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
-                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
+                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], "0")# st.session_state['ti_xp_together'])
                     except Exception as e:
                         st.error("Имаше Проблем при испращането на формуляра! Моля изчакаите докато се опитваме отново.")
                         st.error(e)
                         time.sleep(150)
                         try:
                             id_drive = parser.add_form_to_db(inputs_form, teacher_id, audio_sit_path, audio_act_path, audio_eff_path, 
-                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], st.session_state['ti_xp_together'])
+                                            transcript_sit, transcript_act, transcript_eff, st.session_state['sid'], "0") # st.session_state['ti_xp_together'])
                         except Exception as e:
                             st.error("При втори опит пак не стана. Моля заредете отново или се опитаите в по късен момент пак")
                             st.error(e)
